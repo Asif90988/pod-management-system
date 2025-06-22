@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JIRA Analytics Dashboard - POD Management System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-link {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .dashboard-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .dashboard-section:hover {
+            transform: translateY(-5px);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        /* Full-width sections */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Project Cards */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .project-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #2c3e50, #34495e);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .project-key {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        .project-status {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .project-status.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .project-status.planning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .project-details h4 {
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .project-details p {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .progress-bar {
+            background: #ecf0f1;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .project-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .metric-item {
+            text-align: center;
+            background: rgba(52, 152, 219, 0.1);
+            padding: 0.8rem;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .metric-label {
+            font-size: 0.7rem;
+            color: #7f8c8d;
+            text-transform: uppercase;
+        }
+
+        /* Performance Table */
+        .performance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .performance-table th,
+        .performance-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .performance-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .performance-table td {
+            font-size: 0.9rem;
+        }
+
+        .performance-score {
+            padding: 0.3rem 0.6rem;
+            border-radius: 15px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 60px;
+        }
+
+        .score-exceeding {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .score-meeting {
+            background: #cce5ff;
+            color: #0056b3;
+        }
+
+        .score-below {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* Burndown specific styles */
+        .burndown-selector {
+            margin-bottom: 1rem;
+        }
+
+        .burndown-selector select {
+            padding: 0.5rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: white;
+            font-size: 0.9rem;
+        }
+
+        /* Alerts */
+        .alert {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+
+        .alert:hover {
+            transform: translateX(5px);
+        }
+
+        .alert.critical {
+            background: #ffebee;
+            border-left-color: #f44336;
+            color: #c62828;
+        }
+
+        .alert.warning {
+            background: #fff8e1;
+            border-left-color: #ff9800;
+            color: #e65100;
+        }
+
+        .alert.info {
+            background: #e3f2fd;
+            border-left-color: #2196f3;
+            color: #1565c0;
+        }
+
+        .alert-icon {
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+
+        .alert-content h4 {
+            margin-bottom: 0.2rem;
+            font-weight: 600;
+        }
+
+        .alert-content p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2c3e50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .header-left {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .header-stats {
+                gap: 1rem;
+            }
+            
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>📊 JIRA Analytics Dashboard</h1>
+                <div class="nav-links">
+                    <a href="dashboard.html" class="nav-link">
+                        ← Back to Main Dashboard
+                    </a>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalProjects">-</div>
+                    <div class="stat-label">Projects</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="activeProjects">-</div>
+                    <div class="stat-label">Active</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="avgVelocity">-</div>
+                    <div class="stat-label">Avg Velocity</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="lastUpdate">-</div>
+                    <div class="stat-label">Last Update</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- JIRA Risk Alerts -->
+        <div class="dashboard-section full-width">
+            <div class="section-header">
+                <h2 class="section-title">🚨 JIRA Risk Alerts</h2>
+                <button class="refresh-btn" onclick="refreshAlerts()">Refresh</button>
+            </div>
+            <div id="alertsContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading JIRA alerts...
+                </div>
+            </div>
+        </div>
+
+        <!-- JIRA Projects Overview -->
+        <div class="dashboard-section full-width">
+            <div class="section-header">
+                <h2 class="section-title">📋 JIRA Projects Overview</h2>
+                <button class="refresh-btn" onclick="refreshProjects()">Refresh</button>
+            </div>
+            <div id="projectsContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading JIRA projects...
+                </div>
+            </div>
+        </div>
+
+        <!-- Sprint Burndown Chart -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title">📈 Sprint Burndown</h2>
+                <button class="refresh-btn" onclick="refreshBurndown()">Refresh</button>
+            </div>
+            <div class="burndown-selector">
+                <select id="projectSelector" onchange="loadBurndownChart()">
+                    <option value="AML-MEX">AML Mexico</option>
+                    <option value="KYC-PER">KYC Peru</option>
+                    <option value="TRADE-COL">Trade Colombia</option>
+                    <option value="RISK-BRA">Risk Brazil</option>
+                </select>
+            </div>
+            <div class="chart-container">
+                <canvas id="burndownChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Team Velocity Trend -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title">⚡ Team Velocity Trend</h2>
+                <button class="refresh-btn" onclick="refreshVelocity()">Refresh</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="velocityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Individual JIRA Performance -->
+        <div class="dashboard-section full-width">
+            <div class="section-header">
+                <h2 class="section-title">👥 Individual JIRA Performance</h2>
+                <button class="refresh-btn" onclick="refreshPerformance()">Refresh</button>
+            </div>
+            <div id="performanceContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading individual performance...
+                </div>
+            </div>
+        </div>
+
+        <!-- Quality Metrics -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title">🎯 Quality Metrics</h2>
+                <button class="refresh-btn" onclick="refreshQuality()">Refresh</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="qualityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Bug Tracking -->
+        <div class="dashboard-section">
+            <div class="section-header">
+                <h2 class="section-title">🐛 Bug Tracking</h2>
+                <button class="refresh-btn" onclick="refreshBugs()">Refresh</button>
+            </div>
+            <div class="chart-container">
+                <canvas id="bugChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global data variables
+        let projectsData = null;
+        let performanceData = null;
+        let analyticsData = null;
+        let charts = {};
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing JIRA Analytics Dashboard...');
+            loadAllData();
+            
+            // Auto-refresh every 60 seconds
+            setInterval(loadAllData, 60000);
+        });
+
+        // Load all JIRA data
+        async function loadAllData() {
+            try {
+                console.log('📊 Loading JIRA data...');
+                updateLastUpdate();
+                
+                // Load projects data
+                await loadProjects();
+                
+                // Load performance data
+                await loadPerformance();
+                
+                // Load analytics data
+                await loadAnalytics();
+                
+                // Create charts
+                createCharts();
+                
+            } catch (error) {
+                console.error('❌ JIRA dashboard loading error:', error);
+                showError('Failed to load JIRA data. Please refresh the page.');
+            }
+        }
+
+        // Load JIRA projects
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/jira/projects');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                projectsData = await response.json();
+                console.log('✅ JIRA projects loaded:', projectsData);
+                
+                updateHeaderStats();
+                updateProjects();
+                
+            } catch (error) {
+                console.error('❌ Projects loading error:', error);
+                throw error;
+            }
+        }
+
+        // Load individual performance
+        async function loadPerformance() {
+            try {
+                const response = await fetch('/api/jira/individual-performance');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                performanceData = await response.json();
+                console.log('✅ Performance data loaded:', performanceData);
+                
+                updatePerformance();
+                
+            } catch (error) {
+                console.error('❌ Performance loading error:', error);
+                throw error;
+            }
+        }
+
+        // Load analytics data
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/jira/analytics');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                analyticsData = await response.json();
+                console.log('✅ Analytics data loaded:', analyticsData);
+                
+                updateAlerts();
+                
+            } catch (error) {
+                console.error('❌ Analytics loading error:', error);
+                throw error;
+            }
+        }
+
+        // Update header statistics
+        function updateHeaderStats() {
+            if (!projectsData) return;
+            
+            document.getElementById('totalProjects').textContent = projectsData.totalProjects;
+            document.getElementById('activeProjects').textContent = projectsData.activeProjects;
+            
+            if (performanceData) {
+                document.getElementById('avgVelocity').textContent = 
+                    Math.round(performanceData.teamStats.averageVelocity * 10) / 10;
+            }
+        }
+
+        // Update projects section
+        function updateProjects() {
+            if (!projectsData) return;
+            
+            const container = document.getElementById('projectsContainer');
+            
+            container.innerHTML = `
+                <div class="projects-grid">
+                    ${projectsData.projects.map(project => {
+                        const completionRate = Math.round((project.completedStoryPoints / project.totalStoryPoints) * 100);
+                        return `
+                            <div class="project-card">
+                                <div class="project-header">
+                                    <div class="project-key">${project.key}</div>
+                                    <div class="project-status ${project.status.toLowerCase()}">
+                                        ${project.status}
+                                    </div>
+                                </div>
+                                <div class="project-details">
+                                    <h4>${project.name}</h4>
+                                    <p><strong>Lead:</strong> ${project.lead}</p>
+                                    <p><strong>Sprint:</strong> ${project.activeSprint}</p>
+                                    <p><strong>Team:</strong> ${project.team.length} members</p>
+                                    <p><strong>End Date:</strong> ${new Date(project.sprintEndDate).toLocaleDateString()}</p>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${completionRate}%"></div>
+                                </div>
+                                <div class="progress-text">
+                                    ${project.completedStoryPoints}/${project.totalStoryPoints} Story Points (${completionRate}%)
+                                </div>
+                                <div class="project-metrics">
+                                    <div class="metric-item">
+                                        <div class="metric-value">${project.velocity}</div>
+                                        <div class="metric-label">Velocity</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value">${project.bugCount}</div>
+                                        <div class="metric-label">Bugs</div>
+                                    </div>
+                                    <div class="metric-item">
+                                        <div class="metric-value">${project.sprints}</div>
+                                        <div class="metric-label">Sprints</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        // Update individual performance
+        function updatePerformance() {
+            if (!performanceData) return;
+            
+            const container = document.getElementById('performanceContainer');
+            
+            container.innerHTML = `
+                <table class="performance-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Project</th>
+                            <th>Sprint</th>
+                            <th>Story Points</th>
+                            <th>Completion %</th>
+                            <th>Velocity</th>
+                            <th>Bugs</th>
+                            <th>Quality Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${performanceData.individuals.map(person => `
+                            <tr>
+                                <td><strong>${person.name}</strong></td>
+                                <td>${person.currentProject}</td>
+                                <td>${person.currentSprint}</td>
+                                <td>${person.completedStoryPoints}/${person.assignedStoryPoints}</td>
+                                <td>${person.completionRate}%</td>
+                                <td>${person.velocity}</td>
+                                <td>${person.bugCount}</td>
+                                <td>${person.qualityScore}%</td>
+                                <td>
+                                    <div class="performance-score score-${person.status}">
+                                        ${person.status === 'exceeding' ? '🟢 Exceeding' :
+                                          person.status === 'meeting' ? '🔵 Meeting' :
+                                          '🔴 Below'}
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 1.5rem; padding: 1rem; background: #f8f9fa; border-radius: 10px;">
+                    <h4 style="margin-bottom: 0.5rem; color: #2c3e50;">Team Summary</h4>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; text-align: center;">
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight: bold; color: #27ae60;">
+                                ${Math.round(performanceData.teamStats.averageVelocity * 10) / 10}
+                            </div>
+                            <div style="font-size: 0.8rem; color: #7f8c8d;">Avg Velocity</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight: bold; color: #3498db;">
+                                ${Math.round(performanceData.teamStats.averageCompletionRate)}%
+                            </div>
+                            <div style="font-size: 0.8rem; color: #7f8c8d;">Avg Completion</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight: bold; color: #e74c3c;">
+                                ${performanceData.teamStats.totalBugs}
+                            </div>
+                            <div style="font-size: 0.8rem; color: #7f8c8d;">Total Bugs</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight: bold; color: #9b59b6;">
+                                ${Math.round(performanceData.teamStats.averageQualityScore)}%
+                            </div>
+                            <div style="font-size: 0.8rem; color: #7f8c8d;">Avg Quality</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Update alerts
+        function updateAlerts() {
+            if (!analyticsData) return;
+            
+            const container = document.getElementById('alertsContainer');
+            
+            if (analyticsData.riskIndicators.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #28a745;">
+                        <h3>🟢 All JIRA Projects Normal</h3>
+                        <p>No critical issues detected in any sprints</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = analyticsData.riskIndicators.map(alert => `
+                <div class="alert ${alert.type}">
+                    <div class="alert-icon">
+                        ${alert.type === 'critical' ? '🔴' : 
+                          alert.type === 'warning' ? '🟡' : '🔵'}
+                    </div>
+                    <div class="alert-content">
+                        <h4>${alert.title}</h4>
+                        <p>${alert.message}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Create charts
+        function createCharts() {
+            loadBurndownChart();
+            createVelocityChart();
+            createQualityChart();
+            createBugChart();
+        }
+
+        // Load burndown chart for selected project
+        async function loadBurndownChart() {
+            const projectKey = document.getElementById('projectSelector').value;
+            
+            try {
+                const response = await fetch(`/api/jira/burndown/${projectKey}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const burndownData = await response.json();
+                createBurndownChart(burndownData);
+                
+            } catch (error) {
+                console.error('❌ Burndown chart error:', error);
+            }
+        }
+
+        // Create burndown chart
+        function createBurndownChart(data) {
+            const ctx = document.getElementById('burndownChart').getContext('2d');
+            
+            if (charts.burndown) {
+                charts.burndown.destroy();
+            }
+            
+            charts.burndown = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: data.sprintDays + 1}, (_, i) => `Day ${i}`),
+                    datasets: [
+                        {
+                            label: 'Ideal Burndown',
+                            data: data.idealBurndown,
+                            borderColor: '#95a5a6',
+                            backgroundColor: 'rgba(149, 165, 166, 0.1)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false
+                        },
+                        {
+                            label: 'Actual Burndown',
+                            data: data.actualBurndown,
+                            borderColor: data.riskLevel === 'high' ? '#e74c3c' : 
+                                       data.riskLevel === 'medium' ? '#f39c12' : '#27ae60',
+                            backgroundColor: data.riskLevel === 'high' ? 'rgba(231, 76, 60, 0.1)' : 
+                                           data.riskLevel === 'medium' ? 'rgba(243, 156, 18, 0.1)' : 'rgba(39, 174, 96, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `${data.projectName} - ${data.sprintName}`,
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Story Points'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Sprint Days'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create velocity chart
+        function createVelocityChart() {
+            if (!analyticsData) return;
+            
+            const ctx = document.getElementById('velocityChart').getContext('2d');
+            
+            if (charts.velocity) {
+                charts.velocity.destroy();
+            }
+            
+            charts.velocity = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Sprint 1', 'Sprint 2', 'Sprint 3', 'Sprint 4', 'Sprint 5', 'Sprint 6'],
+                    datasets: [{
+                        label: 'Team Velocity',
+                        data: analyticsData.teamMetrics.teamVelocityTrend,
+                        backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                        borderColor: '#3498db',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Story Points'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create quality chart
+        function createQualityChart() {
+            if (!analyticsData) return;
+            
+            const ctx = document.getElementById('qualityChart').getContext('2d');
+            
+            if (charts.quality) {
+                charts.quality.destroy();
+            }
+            
+            charts.quality = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Code Coverage', 'Code Reviews', 'Bug Fix Rate'],
+                    datasets: [{
+                        data: [
+                            analyticsData.qualityMetrics.testCoverage,
+                            analyticsData.qualityMetrics.codeReviewCoverage,
+                            analyticsData.qualityMetrics.bugFixRate
+                        ],
+                        backgroundColor: [
+                            '#3498db',
+                            '#2ecc71',
+                            '#e74c3c'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create bug chart
+        function createBugChart() {
+            if (!projectsData) return;
+            
+            const ctx = document.getElementById('bugChart').getContext('2d');
+            
+            if (charts.bugs) {
+                charts.bugs.destroy();
+            }
+            
+            const projectKeys = projectsData.projects.map(p => p.key);
+            const bugCounts = projectsData.projects.map(p => p.bugCount);
+            const criticalBugs = projectsData.projects.map(p => p.criticalBugs);
+            
+            charts.bugs = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: projectKeys,
+                    datasets: [
+                        {
+                            label: 'Total Bugs',
+                            data: bugCounts,
+                            backgroundColor: 'rgba(243, 156, 18, 0.8)',
+                            borderColor: '#f39c12',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Critical Bugs',
+                            data: criticalBugs,
+                            backgroundColor: 'rgba(231, 76, 60, 0.8)',
+                            borderColor: '#e74c3c',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Bug Count'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Refresh functions
+        function refreshProjects() {
+            console.log('🔄 Refreshing projects...');
+            loadProjects();
+        }
+
+        function refreshPerformance() {
+            console.log('🔄 Refreshing performance...');
+            loadPerformance();
+        }
+
+        function refreshAlerts() {
+            console.log('🔄 Refreshing alerts...');
+            loadAnalytics();
+        }
+
+        function refreshBurndown() {
+            console.log('🔄 Refreshing burndown...');
+            loadBurndownChart();
+        }
+
+        function refreshVelocity() {
+            console.log('🔄 Refreshing velocity...');
+            createVelocityChart();
+        }
+
+        function refreshQuality() {
+            console.log('🔄 Refreshing quality...');
+            createQualityChart();
+        }
+
+        function refreshBugs() {
+            console.log('🔄 Refreshing bugs...');
+            createBugChart();
+        }
+
+        // Utility functions
+        function updateLastUpdate() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('lastUpdate').textContent = timeString;
+        }
+
+        function showError(message) {
+            const alertsContainer = document.getElementById('alertsContainer');
+            alertsContainer.innerHTML = `
+                <div class="alert critical">
+                    <div class="alert-icon">❌</div>
+                    <div class="alert-content">
+                        <h4>System Error</h4>
+                        <p>${message}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Console welcome message
+        console.log(`
+📊 JIRA Analytics Dashboard - Phase 2C
+======================================
+✅ JIRA Projects Overview
+✅ Sprint Burndown Charts (Interactive)
+✅ Individual JIRA Performance Metrics
+✅ Team Velocity Trends
+✅ Quality Metrics Dashboard
+✅ Bug Tracking Analytics
+✅ Real-time Risk Alerts
+✅ Simulated JIRA Data Integration
+✅ Ready for Real JIRA Connection
+
+JIRA simulation framework complete! 🚀
+
+To connect to real JIRA:
+1. Update API endpoints in server.js
+2. Add JIRA credentials
+3. Replace simulation data with real JIRA calls
+        `);
+    </script>
+</body>
+</html>

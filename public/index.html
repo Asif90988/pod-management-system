@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>POD Management System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 300px; padding: 8px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; }
+        .success { color: green; font-weight: bold; }
+        .user-header { 
+            background: #f8f9fa; 
+            padding: 10px; 
+            text-align: right; 
+            font-size: 0.9em; 
+            border-bottom: 1px solid #ddd; 
+            margin: -20px -20px 20px -20px;
+        }
+        .user-header a { color: #dc3545; text-decoration: none; }
+        .user-header a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div id="userHeader" class="user-header" style="display: none;"></div>
+    
+    <h1>📋 CCB Item Entry Form</h1>
+    
+    <form id="ccbForm">
+        <div class="form-group">
+            <label>Business Line:</label>
+            <select id="businessLine" required>
+                <option value="">Select...</option>
+                <option value="AML">AML</option>
+                <option value="Finance">Finance</option>
+                <option value="OT">O&T</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Country:</label>
+            <select id="country" required>
+                <option value="">Select...</option>
+                <option value="MEX">Mexico</option>
+                <option value="PER">Peru</option>
+                <option value="HND">Honduras</option>
+                <option value="PAN">Panama</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Title:</label>
+            <input type="text" id="title" required placeholder="e.g., Genesis Migration Phase 1">
+        </div>
+        
+        <div class="form-group">
+            <label>Description:</label>
+            <textarea id="description" rows="3" placeholder="Brief description of the work..."></textarea>
+        </div>
+        
+        <button type="submit">✅ Create CCB Item</button>
+    </form>
+    
+    <div id="message"></div>
+
+    <script>
+// Check authentication on page load
+window.onload = function() {
+    const session = localStorage.getItem('userSession');
+    if (!session) {
+        window.location.href = '/login.html';
+        return;
+    }
+    
+    const user = JSON.parse(session);
+    
+    // Check session validity (8 hours)
+    const loginTime = new Date(user.loginTime);
+    const now = new Date();
+    const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+    
+    if (hoursDiff >= 8) {
+        localStorage.removeItem('userSession');
+        window.location.href = '/login.html';
+        return;
+    }
+    
+    // Check if user can create CCB items (creator or admin)
+    if (user.role !== 'creator' && user.role !== 'admin') {
+        alert('You do not have permission to create CCB items.');
+        window.location.href = `/user-dashboard.html`;
+        return;
+    }
+    
+    // Show user info
+    const userHeader = document.getElementById('userHeader');
+    userHeader.innerHTML = `
+        Welcome, <strong>${user.name}</strong> (${user.role}) | 
+        ${user.role === 'admin' ? '<a href="/dashboard.html">📊 Dashboard</a> | ' : ''}
+        <a href="#" onclick="logout()">Logout</a>
+    `;
+    userHeader.style.display = 'block';
+};
+
+function logout() {
+    localStorage.removeItem('userSession');
+    window.location.href = '/login.html';
+}
+
+document.getElementById('ccbForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const data = {
+        businessLine: document.getElementById('businessLine').value,
+        country: document.getElementById('country').value,
+        title: document.getElementById('title').value,
+        description: document.getElementById('description').value
+    };
+    
+    try {
+        const response = await fetch('/api/ccb', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+            const responseData = await response.json();
+            const ccbId = responseData.ccbId;
+document.getElementById('message').innerHTML = `
+    <div style="border: 2px solid green; padding: 20px; margin: 20px 0; background: #f0fff0;">
+        <h3>✅ CCB Item Created Successfully!</h3>
+        <p><strong>CCB ID:</strong> <span style="color: blue; font-family: monospace;">${ccbId}</span></p>
+        <p><strong>Business Line:</strong> ${responseData.ccbItem.business_line}</p>
+        <p><strong>Country:</strong> ${responseData.ccbItem.country}</p>
+        <p><strong>Title:</strong> ${responseData.ccbItem.title}</p>
+        <p><strong>Status:</strong> ${responseData.ccbItem.status}</p>
+        <hr>
+        <button onclick="createPod('${ccbId}')" style="background: green; color: white; padding: 15px 25px; border: none; cursor: pointer; font-size: 16px; border-radius: 5px;">
+            🚀 Create POD for this CCB Item
+        </button>
+    </div>
+`;
+
+            document.getElementById('ccbForm').reset();
+        } else {
+            document.getElementById('message').innerHTML = '<p style="color:red">❌ Error creating CCB item</p>';
+        }
+    } catch (error) {
+        document.getElementById('message').innerHTML = '<p style="color:red">❌ Error: ' + error.message + '</p>';
+    }
+});
+
+function createPod(ccbId) {
+    // Store CCB ID for the next page
+    localStorage.setItem('selectedCcbId', ccbId);
+    // Navigate to POD creation page
+    window.location.href = '/create-pod.html';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POD Summary & Review | Citi LATAM Resource Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .pod-id-banner {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.4em;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .summary-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .summary-card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-card h3::before {
+            content: "📋";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .summary-card.resources h3::before { content: "👥"; }
+        .summary-card.timeline h3::before { content: "📅"; }
+        .summary-card.process h3::before { content: "⚙️"; }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .info-value {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .resource-list {
+            margin-top: 15px;
+        }
+
+        .resource-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            border-left: 3px solid #28a745;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .resource-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .resource-details {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .skill-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .success-criteria {
+            background: #e8f5e8;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            min-width: 160px;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255,167,38,0.4);
+        }
+
+        .btn-launch {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+        }
+
+        .btn-launch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76,175,80,0.4);
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>POD Summary & Review</h1>
+            <p>Review your POD configuration before launch</p>
+        </div>
+
+        <div class="content">
+            <div class="pod-id-banner" id="podIdBanner">
+                Loading POD Details...
+            </div>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>Project Overview</h3>
+                    <div class="info-row">
+                        <span class="info-label">POD Name:</span>
+                        <span class="info-value" id="podName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Business Line:</span>
+                        <span class="info-value" id="businessLine">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Country:</span>
+                        <span class="info-value" id="country">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">POD Lead:</span>
+                        <span class="info-value" id="podLead">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value">Planning<span class="status-badge">Ready to Launch</span></span>
+                    </div>
+                </div>
+
+                <div class="summary-card timeline">
+                    <h3>Timeline & Effort</h3>
+                    <div class="info-row">
+                        <span class="info-label">Start Date:</span>
+                        <span class="info-value" id="startDate">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">End Date:</span>
+                        <span class="info-value" id="endDate">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Estimated Hours:</span>
+                        <span class="info-value" id="estimatedHours">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Sprint Duration:</span>
+                        <span class="info-value" id="sprintDuration">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Review Day:</span>
+                        <span class="info-value" id="reviewDay">-</span>
+                    </div>
+                </div>
+
+                <div class="summary-card resources">
+                    <h3>Team Resources</h3>
+                    <div class="info-row">
+                        <span class="info-label">Team Size:</span>
+                        <span class="info-value" id="teamSize">-</span>
+                    </div>
+                    <div class="resource-list" id="resourceList">
+                        <!-- Resources will be populated here -->
+                    </div>
+                </div>
+
+                <div class="summary-card process">
+                    <h3>Process Requirements</h3>
+                    <div class="info-row">
+                        <span class="info-label">BA Handover:</span>
+                        <span class="info-value" id="baHandover">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Reverse Walkthrough:</span>
+                        <span class="info-value" id="reverseWalkthrough">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Required Skills:</span>
+                        <div class="skills-container" id="skillsContainer">
+                            <!-- Skills will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <h3>Project Scope</h3>
+                <div class="success-criteria" id="projectScope">
+                    Loading project scope...
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <h3>Success Criteria & Deliverables</h3>
+                <div class="success-criteria" id="successCriteria">
+                    Loading success criteria...
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-edit" onclick="editPodConfiguration()">
+                    ✏️ Edit Configuration
+                </button>
+                <button class="btn btn-launch" onclick="launchPod()">
+                    🚀 Launch POD
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load POD data from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPodSummary();
+        });
+
+        function loadPodSummary() {
+            const podData = JSON.parse(localStorage.getItem('currentPodData') || '{}');
+            
+            if (!podData.pod_id) {
+                alert('No POD data found. Please create a POD first.');
+                window.location.href = '/';
+                return;
+            }
+
+            console.log('Loading POD data:', podData);
+
+            // Update POD ID banner
+            document.getElementById('podIdBanner').textContent = podData.pod_id;
+
+            // Update basic info
+            document.getElementById('podName').textContent = podData.pod_name || '-';
+            document.getElementById('businessLine').textContent = podData.business_line || '-';
+            document.getElementById('country').textContent = podData.country || '-';
+            document.getElementById('podLead').textContent = podData.pod_lead || '-';
+
+            // Update timeline
+            document.getElementById('startDate').textContent = podData.start_date ? new Date(podData.start_date).toLocaleDateString() : '-';
+            document.getElementById('endDate').textContent = podData.end_date ? new Date(podData.end_date).toLocaleDateString() : '-';
+            document.getElementById('estimatedHours').textContent = podData.estimated_hours ? podData.estimated_hours + ' hours' : '-';
+            document.getElementById('sprintDuration').textContent = podData.sprintDuration ? podData.sprintDuration + ' weeks' : '-';
+            document.getElementById('reviewDay').textContent = podData.reviewDay || '-';
+
+            // Update team info
+            document.getElementById('teamSize').textContent = podData.teamSize ? podData.teamSize + ' people' : '-';
+
+            // Update process requirements
+            document.getElementById('baHandover').textContent = podData.baHandover ? '✅ Yes' : '❌ No';
+            document.getElementById('reverseWalkthrough').textContent = podData.reverseWalkthrough ? '✅ Yes' : '❌ No';
+
+            // Update scope and success criteria
+            document.getElementById('projectScope').textContent = podData.scope || podData.deliverables || 'No scope defined';
+            document.getElementById('successCriteria').textContent = podData.successCriteria || 'No success criteria defined';
+
+            // Update skills
+            const skillsContainer = document.getElementById('skillsContainer');
+            if (podData.skills && podData.skills.length > 0) {
+                skillsContainer.innerHTML = podData.skills.map(skill => 
+                    `<span class="skill-tag">${skill}</span>`
+                ).join('');
+            } else {
+                skillsContainer.innerHTML = '<span class="info-value">No specific skills defined</span>';
+            }
+
+            // Update resources
+            const resourceList = document.getElementById('resourceList');
+            if (podData.resources && podData.resources.length > 0) {
+                const resourcesHtml = podData.resources.map(resource => `
+                    <div class="resource-item">
+                        <div>
+                            <div class="resource-name">User ${resource.userId}</div>
+                            <div class="resource-details">${resource.role} • ${resource.allocation}% allocation</div>
+                        </div>
+                    </div>
+                `).join('');
+                resourceList.innerHTML = resourcesHtml;
+            } else {
+                resourceList.innerHTML = '<div class="info-value">No resources assigned</div>';
+            }
+        }
+
+        function editPodConfiguration() {
+            if (confirm('Are you sure you want to edit the POD configuration? You will be redirected to the configuration page.')) {
+                window.location.href = '/configure-pod.html';
+            }
+        }
+
+        function launchPod() {
+            if (confirm('Are you sure you want to launch this POD? This will change the status from Planning to Active.')) {
+                const podData = JSON.parse(localStorage.getItem('currentPodData') || '{}');
+                
+                // Call API to launch POD
+                fetch('/api/pods/launch', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        pod_id: podData.pod_id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('🚀 POD launched successfully! Status changed to Active.');
+                        // Redirect to dashboard or back to main page
+                        window.location.href = '/';
+                    } else {
+                        alert('Error launching POD: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Launch error:', error);
+                    alert('Error launching POD. Please try again.');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

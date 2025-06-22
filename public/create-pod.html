@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create POD - POD Management System</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select, textarea { width: 300px; padding: 8px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
+        .ccb-info { background: #e9f7ff; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .pod-id { font-family: monospace; font-size: 18px; color: #007bff; font-weight: bold; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .loading { color: #666; font-style: italic; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Create POD</h1>
+    
+    <div id="ccbInfo" class="ccb-info">
+        <h3>📋 CCB Item Details</h3>
+        <div id="ccbDetails">Loading CCB information...</div>
+    </div>
+    
+    <form id="podForm">
+        <h3>🆔 POD Information</h3>
+        
+        <div class="form-group">
+            <label>Auto-Generated POD ID:</label>
+            <div id="podId" class="pod-id">Generating unique POD ID...</div>
+        </div>
+        
+        <div class="form-group">
+            <label>POD Name:</label>
+            <input type="text" id="podName" required placeholder="e.g., Genesis Migration - Data Setup">
+        </div>
+        
+        <div class="form-group">
+            <label>Planned Start Date:</label>
+            <input type="date" id="startDate" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Planned End Date:</label>
+            <input type="date" id="endDate" required>
+        </div>
+        
+        <div class="form-group">
+            <label>POD Lead:</label>
+            <select id="podLead" required>
+                <option value="">Select POD Lead...</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Estimated Hours:</label>
+            <input type="number" id="estimatedHours" required placeholder="e.g., 160" min="1">
+        </div>
+        
+        <div class="form-group">
+            <label>Project Scope & Deliverables:</label>
+            <textarea id="scope" rows="4" placeholder="Describe the POD scope, deliverables, and success criteria..."></textarea>
+        </div>
+        
+        <button type="submit">✅ Create POD</button>
+        <button type="button" onclick="goBack()">← Back to CCB</button>
+    </form>
+    
+    <div id="message"></div>
+
+<script>
+let selectedCcbId = null;
+
+window.onload = async function() {
+    selectedCcbId = localStorage.getItem('selectedCcbId');
+    
+    if (!selectedCcbId) {
+        document.getElementById('ccbDetails').innerHTML = '<p class="error">No CCB item selected. Please go back and select a CCB item.</p>';
+        return;
+    }
+
+    await loadCcbDetails();
+    await loadUsers();
+    await generatePodIdPreview();
+};
+
+async function loadCcbDetails() {
+    try {
+        const response = await fetch(`/api/ccb/${selectedCcbId}`);
+        const ccbItem = await response.json();
+
+        document.getElementById('ccbDetails').innerHTML = `
+            <p><strong>CCB ID:</strong> ${ccbItem.ccb_id}</p>
+            <p><strong>Business Line:</strong> ${ccbItem.business_line}</p>
+            <p><strong>Country:</strong> ${ccbItem.country}</p>
+            <p><strong>Title:</strong> ${ccbItem.title}</p>
+            <p><strong>Description:</strong> ${ccbItem.description}</p>
+        `;
+    } catch (error) {
+        document.getElementById('ccbDetails').innerHTML = '<p class="error">Error loading CCB details</p>';
+    }
+}
+
+async function loadUsers() {
+    try {
+        const response = await fetch('/api/users');
+        const users = await response.json();
+
+        const select = document.getElementById('podLead');
+        users.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.id;
+            option.textContent = `${user.name} (${user.role})`;
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading users:', error);
+    }
+}
+
+async function generatePodIdPreview() {
+    try {
+        document.getElementById('podId').textContent = 'Generating unique POD ID...';
+        document.getElementById('podId').className = 'pod-id loading';
+        
+        const response = await fetch(`/api/ccb/${selectedCcbId}`);
+        const ccbItem = await response.json();
+
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        
+        console.log('🔢 Getting next POD number for:', {
+            businessLine: ccbItem.business_line,
+            country: ccbItem.country,
+            year,
+            month
+        });
+        
+        // Get the next available POD number for this business line, country, and month
+        const podNumberResponse = await fetch(`/api/pods/next-number?businessLine=${ccbItem.business_line}&country=${ccbItem.country}&year=${year}&month=${month}`);
+        const podNumberData = await podNumberResponse.json();
+        
+        const podNumber = String(podNumberData.nextNumber).padStart(3, '0');
+        const podId = `${ccbItem.business_line}-${ccbItem.country}-${year}-${month}-${podNumber}`;
+
+        document.getElementById('podId').textContent = podId;
+        document.getElementById('podId').className = 'pod-id';
+        
+        console.log('✅ Generated POD ID:', podId);
+    } catch (error) {
+        console.error('Error generating POD ID:', error);
+        document.getElementById('podId').textContent = 'Error generating POD ID';
+        document.getElementById('podId').className = 'pod-id error';
+    }
+}
+
+function goBack() {
+    window.location.href = '/';
+}
+
+function configurePod(podId) {
+    localStorage.setItem('currentPodId', podId);
+    window.location.href = '/configure-pod.html';
+}
+
+document.getElementById('podForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const podId = document.getElementById('podId').textContent;
+    
+    // Don't submit if POD ID is still generating or has error
+    if (podId.includes('Generating') || podId.includes('Error')) {
+        alert('Please wait for POD ID generation to complete');
+        return;
+    }
+    
+    const data = {
+        podId: podId,
+        podName: document.getElementById('podName').value,
+        ccbId: selectedCcbId,
+        startDate: document.getElementById('startDate').value,
+        endDate: document.getElementById('endDate').value,
+        podLead: document.getElementById('podLead').value,
+        estimatedHours: document.getElementById('estimatedHours').value,
+        scope: document.getElementById('scope').value
+    };
+
+    console.log('📝 Submitting POD creation:', data);
+
+    try {
+        const response = await fetch('/api/pods', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            document.getElementById('message').innerHTML = `
+                <div style="border: 2px solid green; padding: 20px; margin: 20px 0; background: #f0fff0;">
+                    <h3>✅ POD Created Successfully!</h3>
+                    <p><strong>POD ID:</strong> <span style="color: blue; font-family: monospace;">${result.pod.pod_id}</span></p>
+                    <p><strong>POD Name:</strong> ${result.pod.pod_name}</p>
+                    <p><strong>Status:</strong> ${result.pod.status}</p>
+                    <button onclick="configurePod('${result.pod.pod_id}')" style="background: green; color: white; padding: 15px 25px; border: none; cursor: pointer; font-size: 16px; border-radius: 5px; margin-top: 10px;">
+                        ⚙️ Configure Resources
+                    </button>
+                </div>
+            `;
+            document.getElementById('podForm').reset();
+            await generatePodIdPreview();  // regenerate after reset
+        } else {
+            const errorData = await response.json();
+            document.getElementById('message').innerHTML = `<p class="error">❌ Error creating POD: ${errorData.error}</p>`;
+        }
+    } catch (error) {
+        console.error('POD creation error:', error);
+        document.getElementById('message').innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
+    }
+});
+</script>
+</body>
+</html>

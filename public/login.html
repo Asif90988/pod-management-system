@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Citi LATAM POD Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: #6c757d;
+            font-size: 1em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+        }
+
+        .login-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+            display: none;
+        }
+
+        .demo-users {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .demo-users h4 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .user-demo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 0.9em;
+        }
+
+        .user-role {
+            background: #f8f9fa;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .user-role.admin { background: #d4edda; color: #155724; }
+        .user-role.creator { background: #fff3cd; color: #856404; }
+        .user-role.user { background: #cce7ff; color: #004085; }
+
+        .quick-login {
+            margin-top: 10px;
+        }
+
+        .quick-btn {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .quick-btn:hover {
+            background: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>🏢 POD Management</h1>
+            <p>Citi LATAM Resource Management System</p>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
+            </div>
+            
+            <button type="submit" class="login-btn" id="loginBtn">
+                🔐 Sign In
+            </button>
+        </form>
+
+        <div class="demo-users">
+            <h4>Demo Users (Development)</h4>
+            
+            <div class="user-demo">
+                <span><strong>vinod</strong> - Executive Dashboard</span>
+                <span class="user-role admin">Admin</span>
+                <button class="quick-btn" onclick="quickLogin('vinod', 'admin123')">Quick Login</button>
+            </div>
+            
+            <div class="user-demo">
+                <span><strong>asif.mohammed</strong> - POD Creator</span>
+                <span class="user-role creator">Creator</span>
+                <button class="quick-btn" onclick="quickLogin('asif.mohammed', 'creator123')">Quick Login</button>
+            </div>
+            
+            <div class="user-demo">
+                <span><strong>srini</strong> - Team Member</span>
+                <span class="user-role user">User</span>
+                <button class="quick-btn" onclick="quickLogin('srini', 'user123')">Quick Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await login();
+        });
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('errorMessage');
+
+            // Reset error message
+            errorDiv.style.display = 'none';
+            
+            // Disable button during login
+            loginBtn.disabled = true;
+            loginBtn.textContent = '🔄 Signing In...';
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Store user session
+                    localStorage.setItem('userSession', JSON.stringify({
+                        id: data.user.id,
+                        username: data.user.username,
+                        name: data.user.name,
+                        role: data.user.role,
+                        email: data.user.email,
+                        loginTime: new Date().toISOString()
+                    }));
+
+                    // Redirect based on role
+                    redirectBasedOnRole(data.user.role);
+                } else {
+                    showError(data.error || 'Login failed');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Connection error. Please try again.');
+            } finally {
+                // Re-enable button
+                loginBtn.disabled = false;
+                loginBtn.textContent = '🔐 Sign In';
+            }
+        }
+
+        function quickLogin(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+        }
+
+        function redirectBasedOnRole(role) {
+            switch(role) {
+                case 'admin':
+                    window.location.href = '/dashboard.html';
+                    break;
+                case 'creator':
+                    window.location.href = '/';
+                    break;
+                case 'user':
+                    window.location.href = '/user-dashboard.html';
+                    break;
+                default:
+                    window.location.href = '/';
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        // Check if user is already logged in
+        window.onload = function() {
+            const session = localStorage.getItem('userSession');
+            if (session) {
+                const user = JSON.parse(session);
+                // Check if session is still valid (less than 8 hours old)
+                const loginTime = new Date(user.loginTime);
+                const now = new Date();
+                const hoursDiff = (now - loginTime) / (1000 * 60 * 60);
+                
+                if (hoursDiff < 8) {
+                    redirectBasedOnRole(user.role);
+                } else {
+                    localStorage.removeItem('userSession');
+                }
+            }
+        };
+    </script>
+</body>
+</html>
