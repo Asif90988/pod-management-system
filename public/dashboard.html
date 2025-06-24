@@ -93,10 +93,115 @@
             letter-spacing: 0.5px;
         }
 
+        /* Search and Filter Controls */
+        .search-controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            margin: 0 auto;
+            max-width: 1600px;
+            border-radius: 15px;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-results-count {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .filter-btn.urgent {
+            border-color: #e74c3c;
+        }
+
+        .filter-btn.urgent.active {
+            background: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        .filter-btn.overdue {
+            border-color: #fd79a8;
+        }
+
+        .filter-btn.overdue.active {
+            background: #fd79a8;
+            border-color: #fd79a8;
+        }
+
+        .filter-btn.watch {
+            border-color: #fdcb6e;
+        }
+
+        .filter-btn.watch.active {
+            background: #fdcb6e;
+            border-color: #fdcb6e;
+        }
+
+        .filter-btn.success {
+            border-color: #00b894;
+        }
+
+        .filter-btn.success.active {
+            background: #00b894;
+            border-color: #00b894;
+        }
+
         .main-container {
             max-width: 1600px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 0 2rem 2rem 2rem;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2rem;
@@ -151,7 +256,7 @@
             grid-column: 1 / -1;
         }
 
-        /* Alerts Section */
+        /* Enhanced Alerts Section */
         .alerts-container {
             margin-bottom: 1rem;
         }
@@ -164,16 +269,22 @@
             border-radius: 10px;
             border-left: 4px solid;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .alert:hover {
             transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         }
 
         .alert.critical {
             background: #ffebee;
             border-left-color: #f44336;
             color: #c62828;
+        }
+
+        .alert.critical.urgent {
+            animation: pulse 2s infinite;
         }
 
         .alert.warning {
@@ -186,6 +297,24 @@
             background: #e3f2fd;
             border-left-color: #2196f3;
             color: #1565c0;
+        }
+
+        .alert.success {
+            background: #e8f5e8;
+            border-left-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(244, 67, 54, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(244, 67, 54, 0);
+            }
         }
 
         .alert-icon {
@@ -292,7 +421,7 @@
             color: #6c757d;
         }
 
-        /* POD Cards */
+        /* Enhanced POD Cards */
         .pods-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -307,11 +436,36 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .pod-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .pod-card.urgent {
+            border-left: 4px solid #e74c3c;
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+        }
+
+        .pod-card.urgent.immediate-attention {
+            animation: pulse 2s infinite;
+        }
+
+        .pod-card.overdue {
+            border-left: 4px solid #fd79a8;
+            background: linear-gradient(135deg, #fff0f5, #fce4ec);
+        }
+
+        .pod-card.watch {
+            border-left: 4px solid #fdcb6e;
+            background: linear-gradient(135deg, #fffbf0, #fff8e1);
+        }
+
+        .pod-card.on-track {
+            border-left: 4px solid #00b894;
+            background: linear-gradient(135deg, #f0fff4, #e8f5e8);
         }
 
         .pod-card::before {
@@ -346,24 +500,28 @@
             letter-spacing: 0.5px;
         }
 
-        .status-indicator.on_track {
-            background: #d4edda;
-            color: #155724;
+        .status-indicator.immediate-attention {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #f44336;
         }
 
-        .status-indicator.delayed {
-            background: #f8d7da;
-            color: #721c24;
+        .status-indicator.time-up {
+            background: #fff0f5;
+            color: #ad1457;
+            border: 2px solid #fd79a8;
         }
 
-        .status-indicator.planning {
-            background: #fff3cd;
-            color: #856404;
+        .status-indicator.watch-priority {
+            background: #fffbf0;
+            color: #f57c00;
+            border: 2px solid #fdcb6e;
         }
 
-        .status-indicator.attention_needed {
-            background: #ffeaa7;
-            color: #d63031;
+        .status-indicator.on-track {
+            background: #f0fff4;
+            color: #2e7d32;
+            border: 2px solid #00b894;
         }
 
         .pod-details {
@@ -460,6 +618,53 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Modal for navigation preview */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
         /* Responsive Design */
         @media (max-width: 1200px) {
             .charts-grid {
@@ -471,6 +676,11 @@
             .main-container {
                 grid-template-columns: 1fr;
                 padding: 1rem;
+            }
+            
+            .search-controls {
+                padding: 1rem;
+                margin: 1rem;
             }
             
             .header-content {
@@ -485,6 +695,15 @@
             
             .header-stats {
                 gap: 1rem;
+            }
+            
+            .search-bar {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
             }
             
             .charts-grid {
@@ -533,17 +752,32 @@
         </div>
     </div>
 
+    <!-- Enhanced Search and Filter Controls -->
+    <div class="search-controls">
+        <div class="search-bar">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Search PODs by ID, name, lead, or business line...">
+            <div class="search-results-count" id="searchResults">Showing all PODs</div>
+        </div>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">All PODs</button>
+            <button class="filter-btn urgent" data-filter="urgent">🚨 Urgent</button>
+            <button class="filter-btn overdue" data-filter="overdue">⏰ Overdue</button>
+            <button class="filter-btn watch" data-filter="watch">👀 Watch</button>
+            <button class="filter-btn success" data-filter="on-track">✅ On Track</button>
+        </div>
+    </div>
+
     <div class="main-container">
-        <!-- Real-time Alerts Section -->
+        <!-- Enhanced Real-time Alerts Section -->
         <div class="dashboard-section alerts-container full-width">
             <div class="section-header">
-                <h2 class="section-title">🚨 Real-time Alerts</h2>
+                <h2 class="section-title">🚨 Smart Status Alerts</h2>
                 <button class="refresh-btn" onclick="refreshAlerts()">Refresh</button>
             </div>
             <div id="alertsContainer">
                 <div class="loading">
                     <div class="spinner"></div>
-                    Loading alerts...
+                    Loading smart alerts...
                 </div>
             </div>
         </div>
@@ -608,7 +842,7 @@
             </div>
         </div>
 
-        <!-- POD Performance Cards -->
+        <!-- Enhanced POD Performance Cards -->
         <div class="dashboard-section full-width">
             <div class="section-header">
                 <h2 class="section-title">🎯 POD Performance Overview</h2>
@@ -637,20 +871,142 @@
         </div>
     </div>
 
+    <!-- Navigation Modal -->
+    <div id="navigationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>🎯 POD Navigation</h2>
+            <p id="modalMessage">Navigation feature will be implemented in the next phase.</p>
+            <br>
+            <button class="refresh-btn" onclick="closeModal()">Got it!</button>
+        </div>
+    </div>
+
     <script>
         // Global dashboard data
         let dashboardData = null;
         let trendsData = null;
         let charts = {};
+        let filteredPods = [];
+        let currentFilter = 'all';
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Initializing Advanced Executive Dashboard...');
+            console.log('🚀 Initializing Enhanced Executive Dashboard...');
             loadDashboard();
+            setupSearchAndFilters();
             
             // Auto-refresh every 30 seconds
             setInterval(loadDashboard, 30000);
         });
+
+        // Setup search and filter functionality
+        function setupSearchAndFilters() {
+            const searchInput = document.getElementById('searchInput');
+            const filterButtons = document.querySelectorAll('.filter-btn');
+
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                handleSearch();
+            });
+
+            // Filter buttons
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    currentFilter = this.dataset.filter;
+                    handleSearch();
+                });
+            });
+        }
+
+        // Handle search and filtering
+        function handleSearch() {
+            if (!dashboardData || !dashboardData.pods) return;
+
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = dashboardData.pods;
+
+            // Apply text search
+            if (searchTerm) {
+                filtered = filtered.filter(pod => 
+                    (pod.pod_id && pod.pod_id.toLowerCase().includes(searchTerm)) ||
+                    (pod.pod_name && pod.pod_name.toLowerCase().includes(searchTerm)) ||
+                    (pod.pod_lead_name && pod.pod_lead_name.toLowerCase().includes(searchTerm)) ||
+                    (pod.business_line && pod.business_line.toLowerCase().includes(searchTerm))
+                );
+            }
+
+            // Apply status filter
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(pod => {
+                    const smartStatus = calculateSmartStatus(pod);
+                    switch (currentFilter) {
+                        case 'urgent':
+                            return smartStatus === 'immediate-attention';
+                        case 'overdue':
+                            return smartStatus === 'time-up';
+                        case 'watch':
+                            return smartStatus === 'watch-priority';
+                        case 'on-track':
+                            return smartStatus === 'on-track';
+                        default:
+                            return true;
+                    }
+                });
+            }
+
+            filteredPods = filtered;
+            updateSearchResults();
+            updateFilteredPODs();
+        }
+
+        // Calculate smart status based on demo feedback rules
+        function calculateSmartStatus(pod) {
+            if (!pod.end_date) {
+                return 'immediate-attention';
+            }
+
+            const today = new Date();
+            const endDate = new Date(pod.end_date);
+            const daysDiff = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+
+            // Check if SAT status (testing phase)
+            if (pod.status === 'SAT' || pod.status === 'Testing') {
+                if (daysDiff <= 0) return 'time-up';
+                if (daysDiff <= 7) return 'watch-priority';
+                return 'on-track';
+            }
+
+            // Apply same logic to Active PODs
+            if (pod.status === 'Active') {
+                if (daysDiff <= 0) return 'time-up';
+                if (daysDiff <= 7) return 'watch-priority';
+                return 'on-track';
+            }
+
+            // Default status for other PODs
+            if (daysDiff <= 0) return 'time-up';
+            if (daysDiff <= 7) return 'watch-priority';
+            return 'on-track';
+        }
+
+        // Update search results count
+        function updateSearchResults() {
+            const totalPods = dashboardData ? dashboardData.pods.length : 0;
+            const filteredCount = filteredPods.length;
+            const searchResults = document.getElementById('searchResults');
+            
+            if (filteredCount === totalPods) {
+                searchResults.textContent = `Showing all ${totalPods} PODs`;
+            } else {
+                searchResults.textContent = `Showing ${filteredCount} of ${totalPods} PODs`;
+            }
+        }
 
         // Load all dashboard data
         async function loadDashboard() {
@@ -665,12 +1021,16 @@
                 dashboardData = await response.json();
                 console.log('✅ Dashboard data loaded:', dashboardData);
                 
+                // Initialize filtered pods
+                filteredPods = dashboardData.pods || [];
+                
                 // Update all sections
                 updateHeaderStats();
-                updateAlerts();
-                updatePODs();
+                updateSmartAlerts();
+                updateFilteredPODs();
                 updatePerformance();
                 updateUtilization();
+                updateSearchResults();
                 
                 // Load trends and create charts
                 await loadTrendsAndCharts();
@@ -847,10 +1207,11 @@
                 charts.podStatus.destroy();
             }
             
-            // Count PODs by status
+            // Count PODs by smart status
             const statusCounts = {};
             dashboardData.pods.forEach(pod => {
-                statusCounts[pod.status] = (statusCounts[pod.status] || 0) + 1;
+                const smartStatus = calculateSmartStatus(pod);
+                statusCounts[smartStatus] = (statusCounts[smartStatus] || 0) + 1;
             });
             
             charts.podStatus = new Chart(ctx, {
@@ -860,10 +1221,10 @@
                     datasets: [{
                         data: Object.values(statusCounts),
                         backgroundColor: [
-                            '#00b894',  // Active
-                            '#fdcb6e',  // Planning
-                            '#e17055',  // Other
-                            '#74b9ff'   // Additional
+                            '#00b894',  // on-track
+                            '#fdcb6e',  // watch-priority
+                            '#fd79a8',  // time-up
+                            '#e74c3c'   // immediate-attention
                         ],
                         borderWidth: 0
                     }]
@@ -938,28 +1299,29 @@
             document.getElementById('utilization').textContent = utilization + '%';
         }
 
-        // Update alerts section
-        function updateAlerts() {
+        // Update smart alerts section with enhanced logic
+        function updateSmartAlerts() {
             if (!dashboardData) return;
             
             const container = document.getElementById('alertsContainer');
+            const smartAlerts = generateSmartAlerts();
             
-            if (dashboardData.alerts.length === 0) {
+            if (smartAlerts.length === 0) {
                 container.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: #28a745;">
-                        <h3>🟢 All Systems Normal</h3>
-                        <p>No critical alerts at this time</p>
+                    <div class="alert success">
+                        <div class="alert-icon">🟢</div>
+                        <div class="alert-content">
+                            <h4>All Systems Normal</h4>
+                            <p>No critical alerts at this time. All PODs are on track!</p>
+                        </div>
                     </div>
                 `;
                 return;
             }
             
-            container.innerHTML = dashboardData.alerts.map(alert => `
-                <div class="alert ${alert.type}">
-                    <div class="alert-icon">
-                        ${alert.type === 'critical' ? '🔴' : 
-                          alert.type === 'warning' ? '🟡' : '🔵'}
-                    </div>
+            container.innerHTML = smartAlerts.map(alert => `
+                <div class="alert ${alert.type} ${alert.urgent ? 'urgent' : ''}" onclick="navigateToPOD('${alert.podId}')">
+                    <div class="alert-icon">${alert.icon}</div>
                     <div class="alert-content">
                         <h4>${alert.title}</h4>
                         <p>${alert.message}</p>
@@ -968,55 +1330,160 @@
             `).join('');
         }
 
-        // Update PODs section
-        function updatePODs() {
-            if (!dashboardData) return;
+        // Generate smart alerts based on POD status
+        function generateSmartAlerts() {
+            if (!dashboardData || !dashboardData.pods) return [];
+            
+            const alerts = [];
+            
+            dashboardData.pods.forEach(pod => {
+                const smartStatus = calculateSmartStatus(pod);
+                
+                switch (smartStatus) {
+                    case 'immediate-attention':
+                        alerts.push({
+                            type: 'critical',
+                            urgent: true,
+                            icon: '🚨',
+                            title: `${pod.pod_id} - Immediate Attention Required`,
+                            message: `No end date specified. Requires immediate planning and timeline assignment.`,
+                            podId: pod.pod_id
+                        });
+                        break;
+                        
+                    case 'time-up':
+                        alerts.push({
+                            type: 'critical',
+                            urgent: false,
+                            icon: '⏰',
+                            title: `${pod.pod_id} - Time Up`,
+                            message: `End date has passed. Current status: ${pod.status}. Immediate action required.`,
+                            podId: pod.pod_id
+                        });
+                        break;
+                        
+                    case 'watch-priority':
+                        alerts.push({
+                            type: 'warning',
+                            urgent: false,
+                            icon: '👀',
+                            title: `${pod.pod_id} - Watch on Priority`,
+                            message: `${Math.ceil((new Date(pod.end_date) - new Date()) / (1000 * 60 * 60 * 24))} days remaining. Monitor closely.`,
+                            podId: pod.pod_id
+                        });
+                        break;
+                }
+            });
+            
+            // Sort alerts by priority: immediate attention > time up > watch priority
+            alerts.sort((a, b) => {
+                const priority = { 'critical': 1, 'warning': 2, 'info': 3 };
+                return priority[a.type] - priority[b.type];
+            });
+            
+            return alerts;
+        }
+
+        // Update filtered PODs display
+        function updateFilteredPODs() {
+            if (!filteredPods) return;
             
             const container = document.getElementById('podsContainer');
             
-            if (dashboardData.pods.length === 0) {
+            if (filteredPods.length === 0) {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 2rem; color: #6c757d;">
                         <h3>No PODs Found</h3>
-                        <p>Create your first POD to get started</p>
+                        <p>No PODs match your current search and filter criteria</p>
                     </div>
                 `;
                 return;
             }
             
+            // Sort PODs by smart status priority
+            const sortedPods = [...filteredPods].sort((a, b) => {
+                const statusPriority = {
+                    'immediate-attention': 1,
+                    'time-up': 2,
+                    'watch-priority': 3,
+                    'on-track': 4
+                };
+                const statusA = calculateSmartStatus(a);
+                const statusB = calculateSmartStatus(b);
+                return statusPriority[statusA] - statusPriority[statusB];
+            });
+            
             container.innerHTML = `
                 <div class="pods-grid">
-                    ${dashboardData.pods.map(pod => `
-                        <div class="pod-card">
-                            <div class="pod-header">
-                                <div class="pod-id">${pod.pod_id}</div>
-                                <div class="status-indicator ${pod.performance_status}">
-                                    ${pod.performance_status === 'on_track' ? '🟢 On Track' :
-                                      pod.performance_status === 'delayed' ? '🔴 Delayed' :
-                                      pod.performance_status === 'planning' ? '🟡 Planning' :
-                                      '🟠 Attention'}
+                    ${sortedPods.map(pod => {
+                        const smartStatus = calculateSmartStatus(pod);
+                        const statusLabel = getStatusLabel(smartStatus);
+                        return `
+                            <div class="pod-card ${smartStatus}" onclick="navigateToPOD('${pod.pod_id}')">
+                                <div class="pod-header">
+                                    <div class="pod-id">${pod.pod_id}</div>
+                                    <div class="status-indicator ${smartStatus}">
+                                        ${statusLabel}
+                                    </div>
+                                </div>
+                                <div class="pod-details">
+                                    <h4>${pod.pod_name || 'Unnamed POD'}</h4>
+                                    <p><strong>Business Line:</strong> ${pod.business_line}</p>
+                                    <p><strong>Country:</strong> ${pod.country}</p>
+                                    <p><strong>Lead:</strong> ${pod.pod_lead_name || 'Unassigned'}</p>
+                                    <p><strong>Team Size:</strong> ${pod.team_size || 0} members</p>
+                                    ${pod.end_date ? 
+                                        `<p><strong>End Date:</strong> ${new Date(pod.end_date).toLocaleDateString()}</p>` : 
+                                        '<p><strong>End Date:</strong> <span style="color: #e74c3c;">Not Set</span></p>'}
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${pod.progress_percentage || 0}%"></div>
+                                </div>
+                                <div class="progress-text">
+                                    ${pod.progress_percentage || 0}% Complete
                                 </div>
                             </div>
-                            <div class="pod-details">
-                                <h4>${pod.pod_name || 'Unnamed POD'}</h4>
-                                <p><strong>Business Line:</strong> ${pod.business_line}</p>
-                                <p><strong>Country:</strong> ${pod.country}</p>
-                                <p><strong>Lead:</strong> ${pod.pod_lead_name || 'Unassigned'}</p>
-                                <p><strong>Team Size:</strong> ${pod.team_size || 0} members</p>
-                                ${pod.days_remaining !== null ? 
-                                    `<p><strong>Days Remaining:</strong> ${Math.max(0, pod.days_remaining)}</p>` : 
-                                    ''}
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${pod.progress_percentage || 0}%"></div>
-                            </div>
-                            <div class="progress-text">
-                                ${pod.progress_percentage || 0}% Complete
-                            </div>
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             `;
+        }
+
+        // Get status label for display
+        function getStatusLabel(smartStatus) {
+            switch (smartStatus) {
+                case 'immediate-attention':
+                    return '🚨 Need Immediate Attention';
+                case 'time-up':
+                    return '⏰ Time Up';
+                case 'watch-priority':
+                    return '👀 Watch on Priority';
+                case 'on-track':
+                    return '✅ On Track';
+                default:
+                    return '❓ Unknown';
+            }
+        }
+
+        // Navigate to POD (currently shows modal)
+        function navigateToPOD(podId) {
+            const modal = document.getElementById('navigationModal');
+            const message = document.getElementById('modalMessage');
+            message.textContent = `Navigation to ${podId} will be implemented in the next phase. This will redirect to the POD details page.`;
+            modal.style.display = 'block';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('navigationModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('navigationModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
         }
 
         // Update individual performance heatmap
@@ -1103,7 +1570,7 @@
 
         function refreshAlerts() {
             console.log('🔄 Manual alerts refresh...');
-            if (dashboardData) updateAlerts();
+            if (dashboardData) updateSmartAlerts();
         }
 
         function refreshPerformance() {
@@ -1118,7 +1585,9 @@
 
         function refreshPODs() {
             console.log('🔄 Manual PODs refresh...');
-            if (dashboardData) updatePODs();
+            if (dashboardData) {
+                handleSearch(); // This will update filtered PODs
+            }
         }
 
         function refreshCharts() {
@@ -1148,20 +1617,27 @@
 
         // Console welcome message
         console.log(`
-📊 Advanced Executive Dashboard - Phase 2B + JIRA Nav
-=====================================================
+📊 Enhanced Executive Dashboard with Smart Search & Status Alerts
+================================================================
+✅ Smart Status Alert System (Priority 1 Complete!)
+✅ Enhanced Search Functionality 
+✅ Status Filter Buttons (Urgent, Overdue, Watch, On Track)
+✅ Clickable Navigation (POD Cards & Alerts)
+✅ Priority-based POD Sorting
+✅ Real-time Search Results Counter
 ✅ Interactive Chart.js Charts
-✅ Real-time Performance Tracking
 ✅ Individual Performance Heatmap  
-✅ POD Status Indicators (🟢🟡🔴)
-✅ Resource Utilization Charts
-✅ Trend Analysis with Visual Charts
-✅ Business Line Analytics
-✅ POD Status Distribution
+✅ Resource Utilization Analytics
+✅ Business Line Performance
 ✅ Auto-refresh every 30 seconds
-✅ JIRA Analytics Navigation Added
 
-Advanced analytics + JIRA navigation ready! 🚀
+🎯 Smart Status Rules Implemented:
+• No end date = 🚨 Immediate Attention
+• ≤7 days = 👀 Watch on Priority  
+• Same/past due = ⏰ Time Up
+• All others = ✅ On Track
+
+Ready for demo with Vinod! 🚀
         `);
     </script>
 </body>

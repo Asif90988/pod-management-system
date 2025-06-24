@@ -330,11 +330,12 @@ app.get('/api/dashboard/pods', async (req, res) => {
 // Enhanced Executive Dashboard APIs - PHASE 2A
 
 // Get detailed POD performance with individual metrics
+// Enhanced Executive Dashboard API with Smart Status Logic
 app.get('/api/dashboard/performance', async (req, res) => {
   try {
-    console.log('📊 Loading enhanced dashboard performance...');
+    console.log('📊 Loading enhanced dashboard with smart status rules...');
     
-    // Get PODs with detailed performance metrics - FIXED PostgreSQL syntax
+    // Get PODs with SMART STATUS LOGIC based on demo feedback
     const podsResult = await pool.query(`
       SELECT 
         p.pod_id,
@@ -347,9 +348,12 @@ app.get('/api/dashboard/performance', async (req, res) => {
         p.team_size,
         p.estimated_hours,
         p.created_at,
+        p.pts_id,
+        p.release_tag,
+        p.work_type,
         u.name as pod_lead_name,
         c.title as ccb_title,
-        -- Calculate progress based on days elapsed (FIXED)
+        -- Calculate progress based on days elapsed
         CASE 
           WHEN p.start_date IS NULL OR p.end_date IS NULL THEN 0
           WHEN CURRENT_DATE < p.start_date THEN 0
@@ -359,64 +363,118 @@ app.get('/api/dashboard/performance', async (req, res) => {
              (p.end_date - p.start_date)::FLOAT) * 100
           )
         END as progress_percentage,
-        -- Determine status indicator
-        CASE 
-          WHEN p.status = 'Active' AND CURRENT_DATE <= p.end_date THEN 'on_track'
-          WHEN p.status = 'Active' AND CURRENT_DATE > p.end_date THEN 'delayed'
-          WHEN p.status = 'Planning' THEN 'planning'
-          ELSE 'attention_needed'
-        END as performance_status,
-        -- Calculate days remaining (FIXED)
+        -- Calculate days remaining
         CASE 
           WHEN p.end_date IS NULL THEN NULL
           ELSE (p.end_date - CURRENT_DATE)
-        END as days_remaining
+        END as days_remaining,
+        
+        -- 🚨 SMART STATUS LOGIC - Based on Demo Feedback
+        CASE 
+          -- NO END DATE = IMMEDIATE ATTENTION (Highest Priority)
+          WHEN p.end_date IS NULL THEN 'need_immediate_attention'
+          
+          -- SAT Status Logic (Testing Phase)
+          WHEN p.status = 'SAT' AND (p.end_date - CURRENT_DATE) <= 0 THEN 'time_up'
+          WHEN p.status = 'SAT' AND (p.end_date - CURRENT_DATE) BETWEEN 1 AND 7 THEN 'watch_on_priority'
+          WHEN p.status = 'SAT' AND (p.end_date - CURRENT_DATE) > 7 THEN 'on_track'
+          
+          -- Active PODs Logic
+          WHEN p.status = 'Active' AND (p.end_date - CURRENT_DATE) <= 0 THEN 'time_up'
+          WHEN p.status = 'Active' AND (p.end_date - CURRENT_DATE) BETWEEN 1 AND 7 THEN 'watch_on_priority'
+          WHEN p.status = 'Active' AND (p.end_date - CURRENT_DATE) > 7 THEN 'on_track'
+          
+          -- Planning Status
+          WHEN p.status = 'Planning' THEN 'planning'
+          
+          -- Default fallback
+          ELSE 'attention_needed'
+        END as performance_status,
+        
+        -- Priority Level for Smart Sorting (1 = Most Urgent)
+        CASE 
+          WHEN p.end_date IS NULL THEN 1                                    -- Immediate attention
+          WHEN (p.end_date - CURRENT_DATE) <= 0 THEN 2                    -- Time up
+          WHEN (p.end_date - CURRENT_DATE) BETWEEN 1 AND 7 THEN 3         -- Watch on priority
+          WHEN p.status = 'Planning' THEN 5                               -- Planning
+          ELSE 4                                                           -- On track
+        END as priority_level,
+        
+        -- Alert Type for Display
+        CASE 
+          WHEN p.end_date IS NULL THEN 'IMMEDIATE'
+          WHEN (p.end_date - CURRENT_DATE) <= 0 THEN 'CRITICAL'
+          WHEN (p.end_date - CURRENT_DATE) BETWEEN 1 AND 7 THEN 'WARNING'
+          ELSE 'SUCCESS'
+        END as alert_type
+        
       FROM pods p
       LEFT JOIN users u ON p.pod_lead = u.id
       LEFT JOIN ccb_items c ON p.ccb_item_id = c.id
-      ORDER BY p.created_at DESC
+      ORDER BY priority_level ASC, p.created_at DESC
     `);
     
-    console.log('✅ PODs query successful, rows found:', podsResult.rows.length);
+    console.log('✅ Enhanced PODs query successful, rows found:', podsResult.rows.length);
     
-    // Get individual performance data (simplified and working)
-    const individualResult = await pool.query(`
-      SELECT 
-        u.id,
-        u.name,
-        u.role,
-        -- Count PODs where user is pod_lead
-        COUNT(p.pod_id) as assigned_pods,
-        -- Simulated performance metrics
-        CASE 
-          WHEN COUNT(p.pod_id) = 0 THEN 0
-          ELSE (75 + (RANDOM() * 25))::INTEGER
-        END as performance_score,
-        -- Simulated activity metrics
-        (5 + (RANDOM() * 15))::INTEGER as weekly_tasks,
-        (30 + (RANDOM() * 15))::INTEGER as weekly_hours,
-        -- Status based on pod assignment
-        CASE 
-          WHEN COUNT(p.pod_id) = 0 THEN 'unassigned'
-          WHEN COUNT(p.pod_id) >= 2 THEN 'exceeding'
-          WHEN COUNT(p.pod_id) = 1 THEN 'meeting'
-          ELSE 'below'
-        END as status
-      FROM users u
-      LEFT JOIN pods p ON u.id = p.pod_lead
-      GROUP BY u.id, u.name, u.role
-      ORDER BY assigned_pods DESC, u.name
-    `);
+    // Enhanced individual performance with new role mapping
+// Enhanced individual performance with new role mapping - FIXED
+const individualResult = await pool.query(`
+  SELECT 
+    u.id,
+    u.name,
+    u.role,
+    u.skill_specialization,
+    -- Count PODs where user is pod_lead
+    COUNT(p.pod_id) as assigned_pods,
+    -- Enhanced performance metrics
+    CASE 
+      WHEN COUNT(p.pod_id) = 0 THEN 0
+      ELSE (75 + (RANDOM() * 25))::INTEGER
+    END as performance_score,
+    -- Simulated JIRA-style metrics
+    (5 + (RANDOM() * 15))::INTEGER as weekly_tasks,
+    (30 + (RANDOM() * 15))::INTEGER as weekly_hours,
+    -- Status based on POD urgency levels - FIXED
+    CASE 
+      WHEN COUNT(p.pod_id) = 0 THEN 'unassigned'
+      WHEN COUNT(CASE WHEN p.priority_level <= 2 THEN 1 END) > 0 THEN 'critical_attention'
+      WHEN COUNT(CASE WHEN p.priority_level = 3 THEN 1 END) > 0 THEN 'watch_required'
+      WHEN COUNT(p.pod_id) >= 2 THEN 'exceeding'
+      WHEN COUNT(p.pod_id) = 1 THEN 'meeting'
+      ELSE 'below'
+    END as user_status
+  FROM users u
+  LEFT JOIN (
+    SELECT pod_id, pod_lead,
+           CASE 
+             WHEN end_date IS NULL THEN 1
+             WHEN (end_date - CURRENT_DATE) <= 0 THEN 2
+             WHEN (end_date - CURRENT_DATE) BETWEEN 1 AND 7 THEN 3
+             ELSE 4
+           END as priority_level
+    FROM pods 
+    WHERE status IN ('Active', 'SAT')
+  ) p ON u.id = p.pod_lead
+  GROUP BY u.id, u.name, u.role, u.skill_specialization
+  ORDER BY 
+    CASE 
+      WHEN COUNT(CASE WHEN p.priority_level <= 2 THEN 1 END) > 0 THEN 1
+      WHEN COUNT(CASE WHEN p.priority_level = 3 THEN 1 END) > 0 THEN 2
+      WHEN COUNT(p.pod_id) >= 2 THEN 3
+      WHEN COUNT(p.pod_id) = 1 THEN 4
+      ELSE 5
+    END,
+    COUNT(p.pod_id) DESC, u.name
+`);
     
     console.log('✅ Individual performance query successful, rows found:', individualResult.rows.length);
     
-    // Get resource utilization (simplified)
+    // Get resource utilization
     const utilizationResult = await pool.query(`
       SELECT 
         COUNT(*) as total_users,
         COUNT(CASE WHEN p.pod_lead IS NOT NULL THEN 1 END) as assigned_users,
         COALESCE(SUM(p.team_size), 0) as total_allocated_resources,
-        -- Calculate utilization percentage
         CASE 
           WHEN COUNT(*) = 0 THEN 0
           ELSE ROUND(
@@ -425,80 +483,106 @@ app.get('/api/dashboard/performance', async (req, res) => {
           )
         END as utilization_percentage
       FROM users u
-      LEFT JOIN pods p ON u.id = p.pod_lead AND p.status = 'Active'
+      LEFT JOIN pods p ON u.id = p.pod_lead AND p.status IN ('Active', 'SAT')
     `);
     
     console.log('✅ Utilization query successful');
     
-    // Generate alerts based on data
+    // 🚨 ENHANCED ALERTS based on Smart Status Logic
     const alerts = [];
     
-    // Check for delayed PODs
-    const delayedPods = podsResult.rows.filter(pod => pod.performance_status === 'delayed');
-    delayedPods.forEach(pod => {
+    // IMMEDIATE ATTENTION alerts (No end date)
+    const immediateAttention = podsResult.rows.filter(pod => 
+      pod.performance_status === 'need_immediate_attention'
+    );
+    immediateAttention.forEach(pod => {
       alerts.push({
         type: 'critical',
-        title: `POD ${pod.pod_id} Delayed`,
-        message: `${pod.pod_name || 'Unnamed POD'} is behind schedule`,
-        pod_id: pod.pod_id
+        title: `🚨 IMMEDIATE ATTENTION: ${pod.pod_id}`,
+        message: `${pod.pod_name || 'Unnamed POD'} has no end date defined - needs immediate planning`,
+        pod_id: pod.pod_id,
+        priority: 1,
+        icon: '🚨'
       });
     });
     
-    // Check for PODs due soon
-    const dueSoonPods = podsResult.rows.filter(pod => 
-      pod.days_remaining !== null && 
-      pod.days_remaining < 7 && 
-      pod.days_remaining >= 0 && 
-      pod.status === 'Active'
+    // TIME UP alerts (Past due date)
+    const timeUpPods = podsResult.rows.filter(pod => 
+      pod.performance_status === 'time_up'
     );
-    dueSoonPods.forEach(pod => {
+    timeUpPods.forEach(pod => {
+      alerts.push({
+        type: 'critical',
+        title: `⏰ TIME UP: ${pod.pod_id}`,
+        message: `${pod.pod_name || 'Unnamed POD'} is past due date - immediate action required`,
+        pod_id: pod.pod_id,
+        priority: 2,
+        icon: '⏰'
+      });
+    });
+    
+    // WATCH ON PRIORITY alerts (1-7 days remaining)
+    const watchPods = podsResult.rows.filter(pod => 
+      pod.performance_status === 'watch_on_priority'
+    );
+    watchPods.forEach(pod => {
+      const daysLeft = Math.max(0, pod.days_remaining);
       alerts.push({
         type: 'warning',
-        title: `POD ${pod.pod_id} Due Soon`,
-        message: `${pod.pod_name || 'Unnamed POD'} due in ${pod.days_remaining} days`,
-        pod_id: pod.pod_id
+        title: `👀 WATCH ON PRIORITY: ${pod.pod_id}`,
+        message: `${pod.pod_name || 'Unnamed POD'} due in ${daysLeft} days - monitor closely`,
+        pod_id: pod.pod_id,
+        priority: 3,
+        icon: '👀'
       });
     });
     
-    // Add resource utilization alerts
+    // Resource utilization alerts
     const utilization = utilizationResult.rows[0];
     if (utilization.utilization_percentage < 70) {
       alerts.push({
         type: 'warning',
-        title: 'Low Resource Utilization',
+        title: '📊 Low Resource Utilization',
         message: `Only ${utilization.utilization_percentage}% of resources allocated`,
-        pod_id: null
-      });
-    }
-    if (utilization.utilization_percentage > 95) {
-      alerts.push({
-        type: 'critical',
-        title: 'Resource Over-allocation',
-        message: `${utilization.utilization_percentage}% utilization - risk of burnout`,
-        pod_id: null
+        pod_id: null,
+        priority: 4,
+        icon: '📊'
       });
     }
     
-    // If no alerts, add a positive message
-    if (alerts.length === 0) {
-      alerts.push({
+    // Sort alerts by priority (most urgent first)
+    alerts.sort((a, b) => a.priority - b.priority);
+    
+    // Add success message if no critical alerts
+    if (alerts.filter(a => a.type === 'critical').length === 0) {
+      alerts.unshift({
         type: 'info',
-        title: 'All Systems Normal',
-        message: 'No critical issues detected at this time',
-        pod_id: null
+        title: '✅ No Critical Issues',
+        message: 'All PODs are within acceptable timeframes',
+        pod_id: null,
+        priority: 0,
+        icon: '✅'
       });
     }
     
+    // Enhanced response with smart status summary
     const responseData = {
       pods: podsResult.rows,
       individuals: individualResult.rows,
       utilization: utilizationResult.rows[0],
       alerts: alerts,
+      smartStatusSummary: {
+        immediate_attention: immediateAttention.length,
+        time_up: timeUpPods.length,
+        watch_on_priority: watchPods.length,
+        on_track: podsResult.rows.filter(p => p.performance_status === 'on_track').length,
+        total_pods: podsResult.rows.length
+      },
       timestamp: new Date().toISOString()
     };
     
     console.log('✅ Enhanced dashboard data prepared successfully');
-    console.log(`📊 Summary: ${podsResult.rows.length} PODs, ${individualResult.rows.length} individuals, ${alerts.length} alerts`);
+    console.log(`📊 Smart Status Summary: ${immediateAttention.length} immediate, ${timeUpPods.length} time up, ${watchPods.length} watch priority, ${responseData.smartStatusSummary.on_track} on track`);
     
     res.json(responseData);
     
@@ -507,7 +591,7 @@ app.get('/api/dashboard/performance', async (req, res) => {
     console.error('Error details:', error.message);
     res.status(500).json({ 
       error: error.message,
-      details: 'Database query failed. Please check server logs.'
+      details: 'Enhanced dashboard query failed. Please check server logs.'
     });
   }
 });
