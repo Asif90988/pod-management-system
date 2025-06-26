@@ -1,939 +1,808 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create POD - POD Management System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 20px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #2c3e50;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .header p {
-            font-size: 1.2em;
-            color: #6c757d;
-        }
-
-        /* Data Source Selection */
-        .data-source-section {
-            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border: 2px solid #667eea;
-        }
-
-        .data-source-title {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .source-options {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .source-option {
-            background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-
-        .source-option:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-            transform: translateY(-2px);
-        }
-
-        .source-option.selected {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
-        }
-
-        .source-icon {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-
-        .source-title {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .source-desc {
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
-
-        /* JIRA Import Section */
-        .jira-import {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .jira-search {
-            margin-bottom: 20px;
-        }
-
-        .jira-search input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        .jira-results {
-            max-height: 300px;
-            overflow-y: auto;
+        .jira-issue-card {
             border: 1px solid #e9ecef;
             border-radius: 8px;
-            background: white;
-        }
-
-        .jira-item {
             padding: 15px;
-            border-bottom: 1px solid #e9ecef;
+            margin: 10px 0;
             cursor: pointer;
-            transition: background 0.2s ease;
+            transition: all 0.3s ease;
         }
-
-        .jira-item:hover {
-            background: #f8f9fa;
+        .jira-issue-card:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 2px 8px rgba(13, 110, 253, 0.15);
         }
-
-        .jira-item.selected {
-            background: #e3f2fd;
-            border-left: 4px solid #2196f3;
+        .jira-issue-card.selected {
+            border-color: #0d6efd;
+            background-color: #f8f9ff;
         }
-
-        .jira-key {
-            font-weight: bold;
-            color: #2196f3;
-            font-family: monospace;
+        .issue-type-badge {
+            font-size: 0.75rem;
+            padding: 2px 6px;
         }
-
-        .jira-summary {
-            margin-top: 5px;
-            color: #2c3e50;
-        }
-
-        .jira-details {
-            margin-top: 5px;
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-
-        /* Excel Upload Section */
-        .excel-upload {
+        .priority-high { border-left: 4px solid #dc3545; }
+        .priority-medium { border-left: 4px solid #ffc107; }
+        .priority-low { border-left: 4px solid #28a745; }
+        .step-indicator {
             background: #f8f9fa;
             border-radius: 10px;
             padding: 20px;
-            margin-top: 20px;
-            display: none;
-            text-align: center;
-        }
-
-        .upload-area {
-            border: 2px dashed #667eea;
-            border-radius: 10px;
-            padding: 40px;
             margin-bottom: 20px;
-            background: white;
+        }
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #0d6efd;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        .ccb-item-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
-        .upload-area:hover {
-            border-color: #4caf50;
-            background: #f0fff4;
+        .ccb-item-card:hover {
+            border-color: #28a745;
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.15);
         }
-
-        .upload-area.dragover {
-            border-color: #4caf50;
-            background: #e8f5e8;
-        }
-
-        .upload-icon {
-            font-size: 3em;
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
-        .form-group { 
-            margin: 15px 0; 
-        }
-
-        label { 
-            display: block; 
-            margin-bottom: 8px; 
-            font-weight: bold; 
-            color: #2c3e50;
-        }
-
-        input, select, textarea { 
-            width: 100%; 
-            padding: 12px; 
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        button { 
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white; 
-            padding: 15px 30px; 
-            border: none; 
-            border-radius: 8px;
-            cursor: pointer; 
-            margin: 10px 5px;
-            font-size: 1.1em;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-            box-shadow: 0 8px 20px rgba(108, 117, 125, 0.4);
-        }
-
-        .ccb-info { 
-            background: linear-gradient(135deg, #e9f7ff, #f0f8ff);
-            padding: 20px; 
-            border-radius: 10px; 
-            margin-bottom: 25px;
-            border: 2px solid #2196f3;
-        }
-
-        .pod-id { 
-            font-family: monospace; 
-            font-size: 18px; 
-            color: #2196f3; 
-            font-weight: bold;
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .success { 
-            color: green; 
-            font-weight: bold; 
-        }
-
-        .error { 
-            color: red; 
-            font-weight: bold; 
-        }
-
-        .loading { 
-            color: #667eea; 
-            font-style: italic; 
-        }
-
-        .imported-data {
-            background: #e8f5e8;
-            border: 1px solid #c3e6cb;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 10px;
-        }
-
-        .imported-label {
-            font-size: 0.9em;
-            color: #155724;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .import-preview {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-
-        .preview-title {
-            font-weight: bold;
-            color: #856404;
-            margin-bottom: 10px;
-        }
-
-        @media (max-width: 768px) {
-            .source-options {
-                grid-template-columns: 1fr;
-            }
-            
-            .container {
-                margin: 10px;
-                padding: 20px;
-            }
+        .ccb-item-card.selected {
+            border-color: #28a745;
+            background-color: #f8fff9;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>🚀 Create POD</h1>
-            <p>Choose your data source or create manually</p>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-cubes me-2"></i>POD Management</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard.html">Dashboard</a>
+                <a class="nav-link" href="#" onclick="logout()">Logout</a>
+            </div>
         </div>
+    </nav>
 
-        <!-- Data Source Selection -->
-        <div class="data-source-section">
-            <div class="data-source-title">📋 Choose Data Source</div>
-            <div class="source-options">
-                <div class="source-option selected" data-source="manual">
-                    <div class="source-icon">✏️</div>
-                    <div class="source-title">Manual Entry</div>
-                    <div class="source-desc">Create from scratch</div>
-                </div>
-                <div class="source-option" data-source="jira">
-                    <div class="source-icon">🔗</div>
-                    <div class="source-title">Import from JIRA</div>
-                    <div class="source-desc">Use existing JIRA epic/story</div>
-                </div>
-                <div class="source-option" data-source="excel">
-                    <div class="source-icon">📊</div>
-                    <div class="source-title">CCB Excel Import</div>
-                    <div class="source-desc">Upload CCB spreadsheet</div>
-                </div>
-                <div class="source-option" data-source="workorder">
-                    <div class="source-icon">📄</div>
-                    <div class="source-title">Work Order</div>
-                    <div class="source-desc">Coming soon...</div>
+    <div class="container mt-4">
+        <!-- Step Indicator -->
+        <div class="step-indicator">
+            <div class="d-flex align-items-center">
+                <div class="step-number">1</div>
+                <div>
+                    <h5 class="mb-1">Create New POD</h5>
+                    <p class="mb-0 text-muted">Choose data source and configure POD details</p>
                 </div>
             </div>
+        </div>
 
-            <!-- JIRA Import Section -->
-            <div id="jiraImport" class="jira-import">
-                <h3>🔍 Search JIRA Issues</h3>
-                <div class="jira-search">
-                    <input type="text" id="jiraSearchInput" placeholder="Search by project key, summary, or ID (e.g., AML-MEX, KYC-PER)...">
-                </div>
-                <div id="jiraResults" class="jira-results">
-                    <div style="padding: 20px; text-align: center; color: #6c757d;">
-                        Enter search terms to find JIRA issues
+        <div class="row">
+            <div class="col-md-8">
+                <!-- Data Source Selection -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5><i class="fas fa-database me-2"></i>Data Source</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Choose Data Source</label>
+                                <select class="form-select" id="dataSourceSelect" onchange="handleDataSourceChange()">
+                                    <option value="manual">Manual Entry</option>
+                                    <option value="jira">Import from JIRA</option>
+                                    <option value="ccb">Import from CCB Excel</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">&nbsp;</label>
+                                <div class="d-grid">
+                                    <button type="button" class="btn btn-outline-primary" id="loadDataBtn" onclick="loadSelectedDataSource()" style="display: none;">
+                                        <i class="fas fa-download me-1"></i>Load Data
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Data source description -->
+                        <div class="mt-3">
+                            <div id="dataSourceDescription" class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                <span id="descriptionText">Create POD from scratch with manual data entry</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div id="importPreview" class="import-preview" style="display: none;">
-                    <div class="preview-title">📋 Preview Imported Data:</div>
-                    <div id="previewContent"></div>
+
+                <!-- JIRA Import Section -->
+                <div id="jiraImportSection" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5><i class="fab fa-jira me-2"></i>Select JIRA Issue</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" id="jiraSearchInput" 
+                                       placeholder="Search JIRA issues..." onkeyup="searchJiraIssues()">
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn btn-outline-primary w-100" onclick="loadJiraIssues()">
+                                    <i class="fas fa-search me-1"></i>Search
+                                </button>
+                            </div>
+                        </div>
+                        <div id="jiraIssuesContainer">
+                            <!-- JIRA issues will be loaded here -->
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Excel Upload Section -->
-            <div id="excelUpload" class="excel-upload">
-                <h3>📊 Upload CCB Excel File</h3>
-                <div class="upload-area" id="uploadArea">
-                    <div class="upload-icon">📁</div>
-                    <div><strong>Drop your CCB Excel file here</strong></div>
-                    <div>or click to browse</div>
-                    <input type="file" id="excelFile" accept=".xlsx,.xls" style="display: none;">
+                <!-- CCB Import Section -->
+                <div id="ccbImportSection" class="card mb-4" style="display: none;">
+                    <div class="card-header">
+                        <h5><i class="fas fa-file-excel me-2"></i>Select CCB Item</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <button class="btn btn-outline-success" onclick="loadCCBItems()">
+                                <i class="fas fa-download me-1"></i>Load CCB Items
+                            </button>
+                        </div>
+                        <div id="ccbItemsContainer">
+                            <!-- CCB items will be loaded here -->
+                        </div>
+                    </div>
                 </div>
-                <div id="excelPreview" style="display: none;"></div>
-            </div>
-        </div>
 
-        <div id="ccbInfo" class="ccb-info">
-            <h3>📋 CCB Item Details</h3>
-            <div id="ccbDetails">Loading CCB information...</div>
-        </div>
-        
-        <form id="podForm">
-            <h3>🆔 POD Information</h3>
-            
-            <div class="form-group">
-                <label>Auto-Generated POD ID:</label>
-                <div id="podId" class="pod-id">Generating unique POD ID...</div>
-            </div>
-            
-            <div class="form-group">
-                <label>POD Name:</label>
-                <input type="text" id="podName" required placeholder="e.g., Genesis Migration - Data Setup">
-                <div id="podNameImported" class="imported-data" style="display: none;">
-                    <div class="imported-label">📥 Imported from source:</div>
-                    <div id="podNameSource"></div>
+                <!-- POD Details Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-cogs me-2"></i>POD Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="podForm">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="form-label">Business Line</label>
+                                    <select class="form-select" id="businessLine" required>
+                                        <option value="">Select Business Line</option>
+                                        <option value="AML">AML</option>
+                                        <option value="KYC">KYC</option>
+                                        <option value="Trade Finance">Trade Finance</option>
+                                        <option value="Risk Management">Risk Management</option>
+                                        <option value="Finance">Finance</option>
+                                        <option value="OT">OT</option>
+                                        <option value="SEC">SEC</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Country</label>
+                                    <select class="form-select" id="country" required>
+                                        <option value="">Select Country</option>
+                                        <option value="MEX">Mexico</option>
+                                        <option value="PER">Peru</option>
+                                        <option value="COL">Colombia</option>
+                                        <option value="BRA">Brazil</option>
+                                        <option value="HND">Honduras</option>
+                                        <option value="PAN">Panama</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="form-label">POD Name</label>
+                                <input type="text" class="form-control" id="podName" required>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="startDate" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">End Date</label>
+                                    <input type="date" class="form-control" id="endDate" required>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">POD Lead</label>
+                                    <select class="form-select" id="podLead" required>
+                                        <option value="">Select POD Lead</option>
+                                        <!-- Will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Estimated Hours</label>
+                                    <input type="number" class="form-control" id="estimatedHours" required>
+                                </div>
+                            </div>
+
+                            <div class="mt-3">
+                                <label class="form-label">Scope</label>
+                                <textarea class="form-control" id="scope" rows="4" 
+                                          placeholder="Describe the scope and objectives of this POD..."></textarea>
+                            </div>
+
+                            <div id="importDataPreview" class="mt-3" style="display: none;">
+                                <div class="alert alert-info">
+                                    <h6><i class="fas fa-info-circle me-2"></i>Imported Data Preview</h6>
+                                    <div id="importDataContent"></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="form-group">
-                <label>Planned Start Date:</label>
-                <input type="date" id="startDate" required>
-                <div id="startDateImported" class="imported-data" style="display: none;">
-                    <div class="imported-label">📥 Imported from source:</div>
-                    <div id="startDateSource"></div>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>Planned End Date:</label>
-                <input type="date" id="endDate" required>
-                <div id="endDateImported" class="imported-data" style="display: none;">
-                    <div class="imported-label">📥 Imported from source:</div>
-                    <div id="endDateSource"></div>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>POD Lead:</label>
-                <select id="podLead" required>
-                    <option value="">Select POD Lead...</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label>Estimated Hours:</label>
-                <input type="number" id="estimatedHours" required placeholder="e.g., 160" min="1">
-                <div id="estimatedHoursImported" class="imported-data" style="display: none;">
-                    <div class="imported-label">📥 Imported from source:</div>
-                    <div id="estimatedHoursSource"></div>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label>Project Scope & Deliverables:</label>
-                <textarea id="scope" rows="6" placeholder="Describe the POD scope, deliverables, and success criteria..."></textarea>
-                <div id="scopeImported" class="imported-data" style="display: none;">
-                    <div class="imported-label">📥 Imported from source:</div>
-                    <div id="scopeSource"></div>
-                </div>
-            </div>
-            
-            <div style="text-align: center; margin-top: 30px;">
-                <button type="submit">✅ Create POD</button>
-                <button type="button" class="btn-secondary" onclick="goBack()">← Back to CCB</button>
-            </div>
-        </form>
-        
-        <div id="message"></div>
-    </div>
 
-<script>
-let selectedCcbId = null;
-let selectedDataSource = 'manual';
-let selectedJiraIssue = null;
-let importedData = {};
-
-window.onload = async function() {
-    selectedCcbId = localStorage.getItem('selectedCcbId');
-    
-    if (!selectedCcbId) {
-        document.getElementById('ccbDetails').innerHTML = '<p class="error">No CCB item selected. Please go back and select a CCB item.</p>';
-        return;
-    }
-
-    await loadCcbDetails();
-    await loadUsers();
-    await generatePodIdPreview();
-    setupEventHandlers();
-    loadSimulatedJiraData(); // Load simulated JIRA data
-};
-
-function setupEventHandlers() {
-    // Data source selection
-    document.querySelectorAll('.source-option').forEach(option => {
-        option.addEventListener('click', function() {
-            document.querySelectorAll('.source-option').forEach(opt => opt.classList.remove('selected'));
-            this.classList.add('selected');
-            selectedDataSource = this.dataset.source;
-            toggleImportSections();
-        });
-    });
-
-    // JIRA search
-    document.getElementById('jiraSearchInput').addEventListener('input', function() {
-        searchJiraIssues(this.value);
-    });
-
-    // Excel upload
-    const uploadArea = document.getElementById('uploadArea');
-    const fileInput = document.getElementById('excelFile');
-
-    uploadArea.addEventListener('click', () => fileInput.click());
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-    });
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
-    });
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-        handleFileUpload(e.dataTransfer.files[0]);
-    });
-    fileInput.addEventListener('change', (e) => {
-        handleFileUpload(e.target.files[0]);
-    });
-}
-
-function toggleImportSections() {
-    // Hide all import sections
-    document.getElementById('jiraImport').style.display = 'none';
-    document.getElementById('excelUpload').style.display = 'none';
-
-    // Show selected section
-    switch(selectedDataSource) {
-        case 'jira':
-            document.getElementById('jiraImport').style.display = 'block';
-            break;
-        case 'excel':
-            document.getElementById('excelUpload').style.display = 'block';
-            break;
-        case 'workorder':
-            alert('Work Order import coming soon! Please use manual entry or JIRA import for now.');
-            // Reset to manual
-            document.querySelector('[data-source="manual"]').click();
-            break;
-    }
-    
-    // Clear previous imports when switching
-    if (selectedDataSource !== 'jira') {
-        selectedJiraIssue = null;
-        hideImportPreview();
-    }
-}
-
-// Simulated JIRA Data
-function loadSimulatedJiraData() {
-    window.simulatedJiraIssues = [
-        {
-            key: 'AML-MEX-001',
-            summary: 'Implement AML Customer Screening Module',
-            description: 'Develop automated customer screening system for AML compliance in Mexico operations. Must integrate with existing customer database and regulatory reporting systems.',
-            project: 'AML-MEX',
-            assignee: 'Asif Mohammed',
-            storyPoints: 13,
-            priority: 'High',
-            startDate: '2025-06-25',
-            endDate: '2025-07-15',
-            acceptanceCriteria: '- Customer data automatically screened against watch lists\n- Real-time alerts for suspicious activities\n- Integration with regulatory reporting\n- 99.9% uptime requirement',
-            businessValue: 'Ensures regulatory compliance and reduces manual screening effort by 80%'
-        },
-        {
-            key: 'KYC-PER-002',
-            summary: 'Enhanced KYC Document Validation Peru',
-            description: 'Upgrade KYC document validation system for Peru compliance requirements. Include OCR capabilities and automated verification workflows.',
-            project: 'KYC-PER',
-            assignee: 'Kanya',
-            storyPoints: 8,
-            priority: 'Medium',
-            startDate: '2025-06-20',
-            endDate: '2025-07-05',
-            acceptanceCriteria: '- OCR integration for document scanning\n- Automated validation workflows\n- Peru regulatory compliance\n- API integration with existing systems',
-            businessValue: 'Improves KYC processing speed by 60% and ensures Peru regulatory compliance'
-        },
-        {
-            key: 'TRADE-COL-003',
-            summary: 'Trade Finance Platform Colombia Launch',
-            description: 'Deploy trade finance platform for Colombian market. Includes local payment methods, currency support, and regulatory compliance.',
-            project: 'TRADE-COL',
-            assignee: 'Srini',
-            storyPoints: 21,
-            priority: 'Critical',
-            startDate: '2025-07-01',
-            endDate: '2025-08-15',
-            acceptanceCriteria: '- Multi-currency support (COP, USD)\n- Local payment gateway integration\n- Colombian regulatory compliance\n- Real-time transaction processing',
-            businessValue: 'Enables trade finance operations in Colombia, projected $2M revenue increase'
-        },
-        {
-            key: 'RISK-BRA-004',
-            summary: 'Risk Assessment Dashboard Brazil',
-            description: 'Create executive risk assessment dashboard for Brazilian operations with real-time monitoring and predictive analytics.',
-            project: 'RISK-BRA',
-            assignee: 'Vinod',
-            storyPoints: 5,
-            priority: 'Medium',
-            startDate: '2025-06-30',
-            endDate: '2025-07-20',
-            acceptanceCriteria: '- Real-time risk metrics display\n- Predictive analytics integration\n- Executive-level reporting\n- Mobile responsive design',
-            businessValue: 'Provides executive visibility into risk exposure and improves decision making'
-        },
-        {
-            key: 'AML-MEX-005',
-            summary: 'Transaction Monitoring Enhancement',
-            description: 'Enhance transaction monitoring system with machine learning algorithms for better fraud detection in Mexico.',
-            project: 'AML-MEX',
-            assignee: 'Asif Mohammed',
-            storyPoints: 15,
-            priority: 'High',
-            startDate: '2025-07-10',
-            endDate: '2025-08-05',
-            acceptanceCriteria: '- ML-based fraud detection\n- Real-time transaction analysis\n- False positive reduction\n- Regulatory reporting integration',
-            businessValue: 'Reduces false positives by 40% and improves fraud detection accuracy'
-        }
-    ];
-}
-
-function searchJiraIssues(searchTerm) {
-    const resultsContainer = document.getElementById('jiraResults');
-    
-    if (!searchTerm.trim()) {
-        resultsContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #6c757d;">Enter search terms to find JIRA issues</div>';
-        return;
-    }
-
-    const filtered = window.simulatedJiraIssues.filter(issue => 
-        issue.key.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        issue.summary.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        issue.project.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    if (filtered.length === 0) {
-        resultsContainer.innerHTML = '<div style="padding: 20px; text-align: center; color: #6c757d;">No JIRA issues found</div>';
-        return;
-    }
-
-    resultsContainer.innerHTML = filtered.map(issue => `
-        <div class="jira-item" onclick="selectJiraIssue('${issue.key}')">
-            <div class="jira-key">${issue.key}</div>
-            <div class="jira-summary">${issue.summary}</div>
-            <div class="jira-details">
-                Project: ${issue.project} • Priority: ${issue.priority} • Story Points: ${issue.storyPoints}
-            </div>
-        </div>
-    `).join('');
-}
-
-function selectJiraIssue(issueKey) {
-    // Remove previous selection
-    document.querySelectorAll('.jira-item').forEach(item => item.classList.remove('selected'));
-    
-    // Add selection to clicked item
-    event.target.closest('.jira-item').classList.add('selected');
-    
-    // Find the issue data
-    selectedJiraIssue = window.simulatedJiraIssues.find(issue => issue.key === issueKey);
-    
-    if (selectedJiraIssue) {
-        showImportPreview();
-        populateFormFromJira();
-    }
-}
-
-function showImportPreview() {
-    const preview = document.getElementById('importPreview');
-    const content = document.getElementById('previewContent');
-    
-    content.innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.9em;">
-            <div><strong>JIRA Key:</strong> ${selectedJiraIssue.key}</div>
-            <div><strong>Priority:</strong> ${selectedJiraIssue.priority}</div>
-            <div><strong>Story Points:</strong> ${selectedJiraIssue.storyPoints}</div>
-            <div><strong>Assignee:</strong> ${selectedJiraIssue.assignee}</div>
-        </div>
-        <div style="margin-top: 10px;">
-            <strong>Summary:</strong> ${selectedJiraIssue.summary}
-        </div>
-        <div style="margin-top: 10px;">
-            <strong>Description:</strong> ${selectedJiraIssue.description.substring(0, 100)}...
-        </div>
-    `;
-    
-    preview.style.display = 'block';
-}
-
-function hideImportPreview() {
-    document.getElementById('importPreview').style.display = 'none';
-    // Hide all imported data indicators
-    document.querySelectorAll('.imported-data').forEach(el => el.style.display = 'none');
-}
-
-function populateFormFromJira() {
-    if (!selectedJiraIssue) return;
-
-    importedData = {
-        source: 'JIRA',
-        sourceKey: selectedJiraIssue.key,
-        podName: selectedJiraIssue.summary,
-        startDate: selectedJiraIssue.startDate,
-        endDate: selectedJiraIssue.endDate,
-        estimatedHours: selectedJiraIssue.storyPoints * 8, // Convert story points to hours
-        scope: selectedJiraIssue.description + '\n\nAcceptance Criteria:\n' + selectedJiraIssue.acceptanceCriteria + '\n\nBusiness Value:\n' + selectedJiraIssue.businessValue
-    };
-
-    // Populate form fields
-    document.getElementById('podName').value = importedData.podName;
-    document.getElementById('startDate').value = importedData.startDate;
-    document.getElementById('endDate').value = importedData.endDate;
-    document.getElementById('estimatedHours').value = importedData.estimatedHours;
-    document.getElementById('scope').value = importedData.scope;
-
-    // Show imported data indicators
-    showImportedDataIndicator('podName', `${selectedJiraIssue.key}: ${selectedJiraIssue.summary}`);
-    showImportedDataIndicator('startDate', `Sprint Start: ${formatDate(selectedJiraIssue.startDate)}`);
-    showImportedDataIndicator('endDate', `Sprint End: ${formatDate(selectedJiraIssue.endDate)}`);
-    showImportedDataIndicator('estimatedHours', `${selectedJiraIssue.storyPoints} story points → ${importedData.estimatedHours} hours`);
-    showImportedDataIndicator('scope', `${selectedJiraIssue.key} description, acceptance criteria, and business value`);
-
-    // Try to auto-assign POD lead based on JIRA assignee
-    const podLeadSelect = document.getElementById('podLead');
-    for (let option of podLeadSelect.options) {
-        if (option.text.toLowerCase().includes(selectedJiraIssue.assignee.toLowerCase())) {
-            option.selected = true;
-            break;
-        }
-    }
-}
-
-function showImportedDataIndicator(fieldName, sourceInfo) {
-    const indicator = document.getElementById(fieldName + 'Imported');
-    const sourceDiv = document.getElementById(fieldName + 'Source');
-    
-    if (indicator && sourceDiv) {
-        sourceDiv.textContent = sourceInfo;
-        indicator.style.display = 'block';
-    }
-}
-
-function handleFileUpload(file) {
-    if (!file) return;
-    
-    if (!file.name.match(/\.(xlsx|xls)$/)) {
-        alert('Please upload a valid Excel file (.xlsx or .xls)');
-        return;
-    }
-
-    const preview = document.getElementById('excelPreview');
-    preview.innerHTML = `
-        <div style="padding: 20px; background: #e8f5e8; border-radius: 8px; margin-top: 15px;">
-            <h4>📊 Excel File Uploaded: ${file.name}</h4>
-            <p>File size: ${(file.size / 1024).toFixed(1)} KB</p>
-            <p style="color: #6c757d; margin-top: 10px;">
-                <em>Excel parsing will be implemented in the next phase. For now, please use manual entry or JIRA import.</em>
-            </p>
-        </div>
-    `;
-    preview.style.display = 'block';
-}
-
-// Rest of your existing functions (loadCcbDetails, loadUsers, etc.)
-async function loadCcbDetails() {
-    try {
-        const response = await fetch(`/api/ccb/${selectedCcbId}`);
-        const ccbItem = await response.json();
-
-        document.getElementById('ccbDetails').innerHTML = `
-            <p><strong>CCB ID:</strong> ${ccbItem.ccb_id}</p>
-            <p><strong>Business Line:</strong> ${ccbItem.business_line}</p>
-            <p><strong>Country:</strong> ${ccbItem.country}</p>
-            <p><strong>Title:</strong> ${ccbItem.title}</p>
-            <p><strong>Description:</strong> ${ccbItem.description}</p>
-        `;
-    } catch (error) {
-        document.getElementById('ccbDetails').innerHTML = '<p class="error">Error loading CCB details</p>';
-    }
-}
-
-async function loadUsers() {
-    try {
-        const response = await fetch('/api/users');
-        const users = await response.json();
-
-        const select = document.getElementById('podLead');
-        users.forEach(user => {
-            const option = document.createElement('option');
-            option.value = user.id;
-            option.textContent = `${user.name} (${user.role})`;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error loading users:', error);
-    }
-}
-
-async function generatePodIdPreview() {
-    try {
-        document.getElementById('podId').textContent = 'Generating unique POD ID...';
-        document.getElementById('podId').className = 'pod-id loading';
-        
-        const response = await fetch(`/api/ccb/${selectedCcbId}`);
-        const ccbItem = await response.json();
-
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        
-        console.log('🔢 Getting next POD number for:', {
-            businessLine: ccbItem.business_line,
-            country: ccbItem.country,
-            year,
-            month
-        });
-        
-        const podNumberResponse = await fetch(`/api/pods/next-number?businessLine=${ccbItem.business_line}&country=${ccbItem.country}&year=${year}&month=${month}`);
-        const podNumberData = await podNumberResponse.json();
-        
-        const podNumber = String(podNumberData.nextNumber).padStart(3, '0');
-        const podId = `${ccbItem.business_line}-${ccbItem.country}-${year}-${month}-${podNumber}`;
-
-        document.getElementById('podId').textContent = podId;
-        document.getElementById('podId').className = 'pod-id';
-        
-        console.log('✅ Generated POD ID:', podId);
-    } catch (error) {
-        console.error('Error generating POD ID:', error);
-        document.getElementById('podId').textContent = 'Error generating POD ID';
-        document.getElementById('podId').className = 'pod-id error';
-    }
-}
-
-function formatDate(dateString) {
-    return new Date(dateString).toLocaleDateString();
-}
-
-function goBack() {
-    window.location.href = '/';
-}
-
-function configurePod(podId) {
-    localStorage.setItem('currentPodId', podId);
-    window.location.href = '/configure-pod.html';
-}
-
-document.getElementById('podForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const podId = document.getElementById('podId').textContent;
-    
-    if (podId.includes('Generating') || podId.includes('Error')) {
-        alert('Please wait for POD ID generation to complete');
-        return;
-    }
-    
-    const data = {
-        podId: podId,
-        podName: document.getElementById('podName').value,
-        ccbId: selectedCcbId,
-        startDate: document.getElementById('startDate').value,
-        endDate: document.getElementById('endDate').value,
-        podLead: document.getElementById('podLead').value,
-        estimatedHours: document.getElementById('estimatedHours').value,
-        scope: document.getElementById('scope').value,
-        // Add import metadata
-        importSource: selectedDataSource,
-        importData: selectedDataSource !== 'manual' ? importedData : null,
-        jiraReference: selectedJiraIssue ? selectedJiraIssue.key : null
-    };
-
-    console.log('📝 Submitting POD creation with import data:', data);
-
-    try {
-        const response = await fetch('/api/pods', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
-
-        if (response.ok) {
-            const result = await response.json();
-            
-            // If imported from JIRA, create initial JIRA stories
-            if (selectedDataSource === 'jira' && selectedJiraIssue) {
-                await createInitialJiraStories(result.pod.pod_id);
-            }
-            
-            document.getElementById('message').innerHTML = `
-                <div style="border: 2px solid green; padding: 20px; margin: 20px 0; background: #f0fff0; border-radius: 10px;">
-                    <h3>✅ POD Created Successfully!</h3>
-                    <p><strong>POD ID:</strong> <span style="color: blue; font-family: monospace;">${result.pod.pod_id}</span></p>
-                    <p><strong>POD Name:</strong> ${result.pod.pod_name}</p>
-                    <p><strong>Status:</strong> ${result.pod.status}</p>
-                    ${selectedDataSource !== 'manual' ? `
-                        <p><strong>Import Source:</strong> ${selectedDataSource.toUpperCase()}</p>
-                        ${selectedJiraIssue ? `<p><strong>JIRA Reference:</strong> ${selectedJiraIssue.key}</p>` : ''}
-                    ` : ''}
-                    <button onclick="configurePod('${result.pod.pod_id}')" 
-                            style="background: green; color: white; padding: 15px 25px; border: none; cursor: pointer; font-size: 16px; border-radius: 5px; margin-top: 15px;">
-                        ⚙️ Configure Resources & Create JIRA Stories
+                <!-- Action Buttons -->
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-primary btn-lg me-3" onclick="createPOD()">
+                        <i class="fas fa-plus me-2"></i>Create POD
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-lg" onclick="goBack()">
+                        <i class="fas fa-arrow-left me-2"></i>Cancel
                     </button>
                 </div>
-            `;
-            document.getElementById('podForm').reset();
-            await generatePodIdPreview();
-        } else {
-            const errorData = await response.json();
-            document.getElementById('message').innerHTML = `<p class="error">❌ Error creating POD: ${errorData.error}</p>`;
-        }
-    } catch (error) {
-        console.error('POD creation error:', error);
-        document.getElementById('message').innerHTML = `<p class="error">❌ Error: ${error.message}</p>`;
-    }
-});
+            </div>
 
-async function createInitialJiraStories(podId) {
-    try {
-        console.log('📝 Creating initial JIRA stories for POD:', podId);
-        
-        // Create demo stories based on the imported JIRA issue
-        const response = await fetch('/api/jira/create-bulk-stories', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                podId: podId,
-                storyCount: 3
-            })
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            console.log('✅ Created initial JIRA stories:', result.stories.length);
+            <div class="col-md-4">
+                <!-- POD ID Preview -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-id-card me-2"></i>POD ID Preview</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center">
+                            <h3 id="podIdPreview" class="text-primary">-</h3>
+                            <p class="text-muted">POD ID will be generated automatically</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Import Summary -->
+                <div id="importSummary" class="card mt-3" style="display: none;">
+                    <div class="card-header">
+                        <h5><i class="fas fa-clipboard-list me-2"></i>Import Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="importSummaryContent">
+                            <!-- Import summary will be shown here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Steps -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-route me-2"></i>Next Steps</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="list-unstyled">
+                            <li class="mb-2">
+                                <span class="badge bg-primary me-2">1</span>
+                                Create POD
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-secondary me-2">2</span>
+                                Configure team & resources
+                            </li>
+                            <li class="mb-2">
+                                <span class="badge bg-secondary me-2">3</span>
+                                Create JIRA stories
+                            </li>
+                            <li>
+                                <span class="badge bg-secondary me-2">4</span>
+                                Launch POD
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedImportType = 'manual';
+        let selectedJiraIssue = null;
+        let selectedCCBItem = null;
+        let availableUsers = [];
+
+        // Load available users for POD lead dropdown
+        function loadUsers() {
+            fetch('/api/users')
+                .then(response => response.json())
+                .then(data => {
+                    availableUsers = data;
+                    const podLeadSelect = document.getElementById('podLead');
+                    podLeadSelect.innerHTML = '<option value="">Select POD Lead</option>';
+                    data.forEach(user => {
+                        podLeadSelect.innerHTML += `<option value="${user.id}">${user.name}</option>`;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading users:', error);
+                });
         }
-    } catch (error) {
-        console.error('❌ Error creating initial JIRA stories:', error);
-    }
-}
-</script>
+
+        // Handle data source dropdown change
+        function handleDataSourceChange() {
+            const selectedSource = document.getElementById('dataSourceSelect').value;
+            const loadBtn = document.getElementById('loadDataBtn');
+            const descriptionText = document.getElementById('descriptionText');
+            
+            // Update description and button visibility
+            switch(selectedSource) {
+                case 'manual':
+                    descriptionText.textContent = 'Create POD from scratch with manual data entry';
+                    loadBtn.style.display = 'none';
+                    break;
+                case 'jira':
+                    descriptionText.textContent = 'Import POD details from existing JIRA issues';
+                    loadBtn.style.display = 'block';
+                    loadBtn.innerHTML = '<i class="fab fa-jira me-1"></i>Search JIRA Issues';
+                    break;
+                case 'ccb':
+                    descriptionText.textContent = 'Import POD details from approved CCB items';
+                    loadBtn.style.display = 'block';
+                    loadBtn.innerHTML = '<i class="fas fa-file-excel me-1"></i>Load CCB Items';
+                    break;
+            }
+            
+            // Hide all import sections
+            document.getElementById('jiraImportSection').style.display = 'none';
+            document.getElementById('ccbImportSection').style.display = 'none';
+            document.getElementById('importSummary').style.display = 'none';
+            
+            // Clear selections
+            selectedJiraIssue = null;
+            selectedCCBItem = null;
+            selectedImportType = selectedSource;
+            clearImportData();
+        }
+
+        // Load selected data source
+        function loadSelectedDataSource() {
+            const selectedSource = document.getElementById('dataSourceSelect').value;
+            
+            if (selectedSource === 'jira') {
+                document.getElementById('jiraImportSection').style.display = 'block';
+                loadJiraIssues();
+            } else if (selectedSource === 'ccb') {
+                document.getElementById('ccbImportSection').style.display = 'block';
+                loadCCBItems();
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUsers();
+            handleDataSourceChange(); // Initialize dropdown state
+            updatePodIdPreview();
+            
+            // Add event listeners for auto-updating POD ID
+            document.getElementById('businessLine').addEventListener('change', updatePodIdPreview);
+            document.getElementById('country').addEventListener('change', updatePodIdPreview);
+        });
+
+        // Load JIRA issues
+        function loadJiraIssues() {
+            showToast('Loading JIRA issues...', 'info');
+            
+            fetch('/api/jira/search')
+                .then(response => response.json())
+                .then(data => {
+                    renderJiraIssues(data.issues);
+                    showToast(`Found ${data.issues.length} JIRA issues`, 'success');
+                })
+                .catch(error => {
+                    console.error('Error loading JIRA issues:', error);
+                    showToast('Error loading JIRA issues', 'error');
+                });
+        }
+
+        // Render JIRA issues
+        function renderJiraIssues(issues) {
+            const container = document.getElementById('jiraIssuesContainer');
+            container.innerHTML = '';
+            
+            if (issues.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No JIRA issues found</p>';
+                return;
+            }
+            
+            issues.forEach(issue => {
+                const issueCard = document.createElement('div');
+                issueCard.className = `jira-issue-card priority-${issue.priority.toLowerCase()}`;
+                issueCard.onclick = () => selectJiraIssue(issue);
+                issueCard.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="mb-1">${issue.summary}</h6>
+                            <small class="text-primary">${issue.key}</small>
+                        </div>
+                        <div>
+                            <span class="badge bg-secondary issue-type-badge">${issue.issueType}</span>
+                            <span class="badge bg-${issue.priority.toLowerCase() === 'high' ? 'danger' : issue.priority.toLowerCase() === 'medium' ? 'warning' : 'success'} issue-type-badge">${issue.priority}</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-2">${issue.description}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-light text-dark">${issue.businessLine} - ${issue.country}</span>
+                        <small class="text-muted">Assigned to: ${issue.assignee}</small>
+                    </div>
+                `;
+                container.appendChild(issueCard);
+            });
+        }
+
+        // Select JIRA issue
+        function selectJiraIssue(issue) {
+            selectedJiraIssue = issue;
+            
+            // Update UI
+            document.querySelectorAll('.jira-issue-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Pre-populate form fields
+            document.getElementById('businessLine').value = issue.businessLine;
+            document.getElementById('country').value = issue.country === 'Mexico' ? 'MEX' : 
+                                                       issue.country === 'Peru' ? 'PER' : 
+                                                       issue.country === 'Colombia' ? 'COL' : 
+                                                       issue.country === 'Brazil' ? 'BRA' : issue.country;
+            document.getElementById('podName').value = issue.summary;
+            document.getElementById('scope').value = issue.scope || issue.description;
+            
+            // Estimate hours from timeEstimate if available
+            if (issue.timeEstimate) {
+                const hours = parseInt(issue.timeEstimate.replace('h', ''));
+                document.getElementById('estimatedHours').value = hours;
+            }
+            
+            // Set dates based on JIRA due date
+            if (issue.dueDate) {
+                const dueDate = new Date(issue.dueDate);
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() + 7); // Start in a week
+                
+                document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+                document.getElementById('endDate').value = dueDate.toISOString().split('T')[0];
+            }
+            
+            updatePodIdPreview();
+            showImportSummary(issue, 'jira');
+            showToast(`JIRA issue ${issue.key} selected`, 'success');
+        }
+
+        // Load CCB items
+        function loadCCBItems() {
+            showToast('Loading CCB items...', 'info');
+            
+            fetch('/api/ccb/items')
+                .then(response => response.json())
+                .then(data => {
+                    renderCCBItems(data.items);
+                    showToast(`Found ${data.items.length} CCB items`, 'success');
+                })
+                .catch(error => {
+                    console.error('Error loading CCB items:', error);
+                    showToast('Error loading CCB items', 'error');
+                });
+        }
+
+        // Render CCB items
+        function renderCCBItems(items) {
+            const container = document.getElementById('ccbItemsContainer');
+            container.innerHTML = '';
+            
+            if (items.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No CCB items found</p>';
+                return;
+            }
+            
+            items.forEach(item => {
+                const itemCard = document.createElement('div');
+                itemCard.className = 'ccb-item-card';
+                itemCard.onclick = () => selectCCBItem(item);
+                itemCard.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="mb-1">${item.title}</h6>
+                            <small class="text-success">${item.ccbId}</small>
+                        </div>
+                        <div>
+                            <span class="badge bg-${item.status === 'Approved' ? 'success' : 'warning'}">${item.status}</span>
+                            <span class="badge bg-${item.priority === 'Critical' ? 'danger' : item.priority === 'High' ? 'warning' : 'info'}">${item.priority}</span>
+                        </div>
+                    </div>
+                    <p class="small text-muted mb-2">${item.description}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-light text-dark">${item.businessLine} - ${item.country}</span>
+                        <small class="text-muted">Target: ${item.targetDate}</small>
+                    </div>
+                `;
+                container.appendChild(itemCard);
+            });
+        }
+
+        // Select CCB item
+        function selectCCBItem(item) {
+            selectedCCBItem = item;
+            
+            // Update UI
+            document.querySelectorAll('.ccb-item-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Pre-populate form fields
+            document.getElementById('businessLine').value = item.businessLine;
+            document.getElementById('country').value = item.country === 'Mexico' ? 'MEX' : 
+                                                       item.country === 'Peru' ? 'PER' : 
+                                                       item.country === 'Colombia' ? 'COL' : 
+                                                       item.country === 'Brazil' ? 'BRA' : item.country;
+            document.getElementById('podName').value = item.title;
+            document.getElementById('scope').value = item.scope || item.description;
+            
+            // Estimate hours from effort
+            if (item.estimatedEffort) {
+                const hours = parseInt(item.estimatedEffort.replace('h', ''));
+                document.getElementById('estimatedHours').value = hours;
+            }
+            
+            // Set dates based on CCB target date
+            if (item.targetDate) {
+                const targetDate = new Date(item.targetDate);
+                const startDate = new Date();
+                startDate.setDate(startDate.getDate() + 7); // Start in a week
+                
+                document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+                document.getElementById('endDate').value = targetDate.toISOString().split('T')[0];
+            }
+            
+            updatePodIdPreview();
+            showImportSummary(item, 'ccb');
+            showToast(`CCB item ${item.ccbId} selected`, 'success');
+        }
+
+        // Show import summary
+        function showImportSummary(data, type) {
+            const summaryDiv = document.getElementById('importSummary');
+            const contentDiv = document.getElementById('importSummaryContent');
+            
+            let content = '';
+            if (type === 'jira') {
+                content = `
+                    <p><strong>JIRA Issue:</strong> ${data.key}</p>
+                    <p><strong>Summary:</strong> ${data.summary}</p>
+                    <p><strong>Assignee:</strong> ${data.assignee}</p>
+                    <p><strong>Priority:</strong> ${data.priority}</p>
+                    <p><strong>Deliverables:</strong> ${data.deliverables?.length || 0} items</p>
+                `;
+            } else if (type === 'ccb') {
+                content = `
+                    <p><strong>CCB ID:</strong> ${data.ccbId}</p>
+                    <p><strong>Title:</strong> ${data.title}</p>
+                    <p><strong>Status:</strong> ${data.status}</p>
+                    <p><strong>Priority:</strong> ${data.priority}</p>
+                    <p><strong>Estimated Effort:</strong> ${data.estimatedEffort}</p>
+                `;
+            }
+            
+            contentDiv.innerHTML = content;
+            summaryDiv.style.display = 'block';
+        }
+
+        // Clear import data
+        function clearImportData() {
+            // Clear form fields
+            document.getElementById('podForm').reset();
+            updatePodIdPreview();
+        }
+
+        // Search JIRA issues
+        function searchJiraIssues() {
+            const searchTerm = document.getElementById('jiraSearchInput').value;
+            if (searchTerm.length >= 2) {
+                fetch(`/api/jira/search?query=${encodeURIComponent(searchTerm)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        renderJiraIssues(data.issues);
+                    })
+                    .catch(error => {
+                        console.error('Error searching JIRA issues:', error);
+                    });
+            } else if (searchTerm.length === 0) {
+                loadJiraIssues(); // Reload all issues
+            }
+        }
+
+        // Update POD ID preview
+        function updatePodIdPreview() {
+            const businessLine = document.getElementById('businessLine').value;
+            const country = document.getElementById('country').value;
+            
+            if (businessLine && country) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                
+                // Get next POD number
+                fetch(`/api/pods/next-number?businessLine=${businessLine}&country=${country}&year=${year}&month=${month}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const podId = `${businessLine}-${country}-${year}-${month}-${String(data.nextNumber).padStart(3, '0')}`;
+                        document.getElementById('podIdPreview').textContent = podId;
+                    })
+                    .catch(error => {
+                        console.error('Error getting POD number:', error);
+                        const podId = `${businessLine}-${country}-${year}-${month}-001`;
+                        document.getElementById('podIdPreview').textContent = podId;
+                    });
+            } else {
+                document.getElementById('podIdPreview').textContent = '-';
+            }
+        }
+
+        // Create POD
+        function createPOD() {
+            const form = document.getElementById('podForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const podData = {
+                podId: document.getElementById('podIdPreview').textContent,
+                podName: document.getElementById('podName').value,
+                businessLine: document.getElementById('businessLine').value,
+                country: document.getElementById('country').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                podLead: document.getElementById('podLead').value,
+                estimatedHours: document.getElementById('estimatedHours').value,
+                scope: document.getElementById('scope').value,
+                importSource: selectedImportType,
+                importData: selectedImportType === 'jira' ? selectedJiraIssue : 
+                           selectedImportType === 'ccb' ? selectedCCBItem : null,
+                jiraReference: selectedJiraIssue ? selectedJiraIssue.key : null
+            };
+
+            // Need CCB ID - create one if importing from JIRA or manual
+            let ccbId;
+            if (selectedImportType === 'ccb' && selectedCCBItem) {
+                ccbId = selectedCCBItem.ccbId;
+                podData.ccbId = ccbId;
+                proceedWithPODCreation(podData);
+            } else {
+                // Create a CCB item first
+                const ccbData = {
+                    businessLine: podData.businessLine,
+                    country: podData.country,
+                    title: podData.podName,
+                    description: podData.scope || 'Auto-generated CCB item for POD creation'
+                };
+
+                createCCBItem(ccbData)
+                    .then(ccbResponse => {
+                        podData.ccbId = ccbResponse.ccbId;
+                        proceedWithPODCreation(podData);
+                    })
+                    .catch(error => {
+                        console.error('Error creating CCB item:', error);
+                        showToast('Error creating CCB item', 'error');
+                    });
+            }
+        }
+
+        // Create CCB item
+        function createCCBItem(ccbData) {
+            return fetch('/api/ccb', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(ccbData)
+            })
+            .then(response => response.json());
+        }
+
+        // Proceed with POD creation
+        function proceedWithPODCreation(podData) {
+            showToast('Creating POD...', 'info');
+
+            fetch('/api/pods', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(podData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('POD created successfully!', 'success');
+                    
+                    // Store import data for configure page
+                    if (selectedImportType !== 'manual') {
+                        localStorage.setItem('podImportData', JSON.stringify({
+                            podId: podData.podId,
+                            importSource: selectedImportType,
+                            importData: podData.importData
+                        }));
+                    }
+                    
+                    setTimeout(() => {
+                        window.location.href = `/configure-pod.html?podId=${encodeURIComponent(podData.podId)}`;
+                    }, 1500);
+                } else {
+                    showToast('Error creating POD: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error creating POD:', error);
+                showToast('Error creating POD', 'error');
+            });
+        }
+
+        // Go back
+        function goBack() {
+            window.history.back();
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'primary'} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        // Create toast container
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+            return container;
+        }
+    </script>
 </body>
 </html>

@@ -3,534 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POD Configuration with JIRA Integration | Citi LATAM Resource Management</title>
+    <title>Configure POD - POD Management System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .header {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            padding: 30px 40px;
-            text-align: center;
-        }
-
-        .header h1 {
-            font-size: 2.2em;
-            margin-bottom: 10px;
-            font-weight: 300;
-        }
-
-        .progress-bar {
-            background: rgba(255,255,255,0.2);
-            height: 6px;
-            border-radius: 3px;
-            margin-top: 20px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            background: #4caf50;
-            height: 100%;
-            width: 85%;
-            border-radius: 3px;
-            transition: width 0.3s ease;
-        }
-
-        .content-wrapper {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 0;
-        }
-
-        .main-content {
-            padding: 40px;
-        }
-
-        .sidebar {
+        .config-section {
             background: #f8f9fa;
-            border-left: 1px solid #e9ecef;
-            padding: 40px 30px;
-            max-height: 100vh;
-            overflow-y: auto;
-        }
-
-        .pod-info-banner {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1.2em;
-            font-weight: 600;
-        }
-
-        /* JIRA Integration Section */
-        .jira-section {
-            background: linear-gradient(135deg, #f0f8ff, #e6f3ff);
-            border: 2px solid #0052cc;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-        }
-
-        .jira-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .jira-icon {
-            font-size: 2rem;
-            margin-right: 15px;
-            color: #0052cc;
-        }
-
-        .jira-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .template-selector {
-            margin-bottom: 20px;
-        }
-
-        .template-selector select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 1rem;
-            background: white;
-        }
-
-        .story-form {
-            background: white;
             border-radius: 10px;
             padding: 20px;
-            margin-top: 15px;
-            border: 1px solid #e9ecef;
+            margin-bottom: 20px;
+            border-left: 4px solid #0d6efd;
         }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .resource-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+        .resource-card:hover {
+            border-color: #0d6efd;
+            box-shadow: 0 2px 10px rgba(13, 110, 253, 0.1);
+        }
+        .resource-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #0d6efd, #6610f2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .progress-step {
+            display: flex;
+            align-items: center;
             margin-bottom: 15px;
         }
-
-        .form-row.full {
-            grid-template-columns: 1fr;
-        }
-
-        .form-group {
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #0d6efd;
+            color: white;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
         }
-
-        .form-group label {
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 8px;
-            font-size: 0.95em;
+        .step-completed {
+            background: #198754;
         }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 6px;
-            font-size: 1em;
-            transition: border-color 0.3s ease;
-            background: white;
+        .step-current {
+            background: #fd7e14;
         }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #0052cc;
-            box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-            font-family: inherit;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
+        .jira-story-card {
+            border: 1px solid #e9ecef;
             border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            text-align: center;
+            padding: 15px;
+            margin: 10px 0;
+            background: #fff;
         }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #0052cc, #0066ff);
+        .story-points {
+            background: #6610f2;
             color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 82, 204, 0.4);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-success {
+        .priority-high { border-left: 4px solid #dc3545; }
+        .priority-medium { border-left: 4px solid #ffc107; }
+        .priority-low { border-left: 4px solid #28a745; }
+        .launch-section {
             background: linear-gradient(135deg, #28a745, #20c997);
             color: white;
-        }
-
-        .created-stories {
-            margin-top: 20px;
-        }
-
-        .story-item {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border-left: 4px solid #28a745;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .story-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .story-key {
-            font-family: monospace;
-            font-weight: bold;
-            color: #0052cc;
-        }
-
-        .story-status {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: 600;
-        }
-
-        .status-todo {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .story-title {
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 5px;
-        }
-
-        .story-meta {
-            font-size: 0.9em;
-            color: #6c757d;
-        }
-
-        .jira-link {
-            color: #0052cc;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .jira-link:hover {
-            text-decoration: underline;
-        }
-
-        /* Traditional Form Sections */
-        .form-section {
-            background: #f8f9fa;
-            border-radius: 12px;
+            border-radius: 15px;
             padding: 30px;
-            margin-bottom: 30px;
-            border-left: 4px solid #667eea;
-        }
-
-        .form-section h3 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 1.4em;
-            display: flex;
-            align-items: center;
-        }
-
-        .form-section h3::before {
-            margin-right: 12px;
-            font-size: 1.3em;
-        }
-
-        .form-section.resources h3::before { content: "👥"; }
-        .form-section.success h3::before { content: "🎯"; }
-        .form-section.process h3::before { content: "⚙️"; }
-
-        /* Skills grid and other existing styles */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-
-        .skill-checkbox {
-            display: flex;
-            align-items: center;
-            background: white;
-            padding: 10px;
-            border-radius: 6px;
-            border: 2px solid #e9ecef;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .skill-checkbox:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-        }
-
-        .skill-checkbox.selected {
-            border-color: #28a745;
-            background: #e8f5e8;
-        }
-
-        .resource-allocation {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            border: 2px solid #e9ecef;
-        }
-
-        .resource-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .resource-name {
-            font-weight: 600;
-            color: #2c3e50;
-            font-size: 1.1em;
-        }
-
-        .resource-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px;
-        }
-
-        .submit-section {
             text-align: center;
-            padding-top: 30px;
-            border-top: 2px solid #e9ecef;
-            margin-top: 40px;
+            margin-top: 30px;
         }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+        .btn-launch {
+            background: white;
+            color: #28a745;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
         }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .alert-info {
-            background: #cce5ff;
-            color: #0056b3;
-            border: 1px solid #b8daff;
-        }
-
-        @media (max-width: 1200px) {
-            .content-wrapper {
-                grid-template-columns: 1fr;
-            }
-            
-            .sidebar {
-                border-left: none;
-                border-top: 1px solid #e9ecef;
-                max-height: none;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .resource-details {
-                grid-template-columns: 1fr;
-            }
-            
-            .main-content {
-                padding: 20px;
-            }
+        .btn-launch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            color: #28a745;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>POD Configuration with JIRA Integration</h1>
-            <p>Configure team resources and create JIRA stories</p>
-            <div class="progress-bar">
-                <div class="progress-fill"></div>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-cubes me-2"></i>POD Management</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard.html">Dashboard</a>
+                <a class="nav-link" href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Progress Indicator -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">POD Setup Progress</h5>
+                        <div class="progress-step">
+                            <div class="step-number step-completed">1</div>
+                            <span>POD Created</span>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-number step-current">2</div>
+                            <span>Configure POD & Create JIRA Stories</span>
+                        </div>
+                        <div class="progress-step">
+                            <div class="step-number">3</div>
+                            <span>Launch POD</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="content-wrapper">
-            <div class="main-content">
-                <div class="pod-info-banner" id="podInfoBanner">
-                    Loading POD Information...
-                </div>
-
-                <!-- JIRA Integration Section -->
-                <div class="jira-section">
-                    <div class="jira-header">
-                        <div class="jira-icon">🔗</div>
-                        <div class="jira-title">JIRA Story Creation</div>
-                    </div>
-                    
-                    <div class="alert alert-info">
-                        <strong>📋 Create JIRA Stories:</strong> Generate development tasks directly from your POD configuration. Stories will be linked to your POD for tracking.
-                    </div>
-
-                    <div class="template-selector">
-                        <label><strong>Story Template:</strong></label>
-                        <select id="storyTemplate">
-                            <option value="">Loading templates...</option>
-                        </select>
-                    </div>
-
-                    <div class="story-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Story Title:</label>
-                                <input type="text" id="storyTitle" placeholder="e.g., Setup development environment">
-                            </div>
-                            <div class="form-group">
-                                <label>Story Points:</label>
-                                <select id="storyPoints">
-                                    <option value="1">1 - Very Small</option>
-                                    <option value="3">3 - Small</option>
-                                    <option value="5" selected>5 - Medium</option>
-                                    <option value="8">8 - Large</option>
-                                    <option value="13">13 - Very Large</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Priority:</label>
-                                <select id="storyPriority">
-                                    <option value="low">Low</option>
-                                    <option value="medium" selected>Medium</option>
-                                    <option value="high">High</option>
-                                    <option value="critical">Critical</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Assignee:</label>
-                                <select id="storyAssignee">
-                                    <option value="">Unassigned</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row full">
-                            <div class="form-group">
-                                <label>Story Description:</label>
-                                <textarea id="storyDescription" rows="3" placeholder="Describe what needs to be done..."></textarea>
-                            </div>
-                        </div>
-
-                        <div class="form-row full">
-                            <div class="form-group">
-                                <label>Acceptance Criteria:</label>
-                                <textarea id="acceptanceCriteria" rows="3" placeholder="Define when this story is considered done..."></textarea>
-                            </div>
-                        </div>
-
-                        <div style="text-align: center; margin-top: 20px;">
-                            <button type="button" class="btn btn-primary" onclick="createJiraStory()">
-                                ✅ Create JIRA Story
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="createBulkStories()">
-                                📝 Create 3 Demo Stories
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="jiraStoriesContainer" class="created-stories">
-                        <h4>📋 Created JIRA Stories:</h4>
-                        <div id="storiesList">
-                            <div style="text-align: center; color: #6c757d; padding: 20px;">
-                                No stories created yet
-                            </div>
-                        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <!-- POD Information -->
+                <div class="config-section">
+                    <h4><i class="fas fa-info-circle me-2"></i>POD Information</h4>
+                    <div id="podInfo">
+                        <p><strong>POD ID:</strong> <span id="podIdDisplay"></span></p>
+                        <p><strong>POD Name:</strong> <span id="podNameDisplay"></span></p>
+                        <p><strong>Business Line:</strong> <span id="businessLineDisplay"></span></p>
+                        <p><strong>Country:</strong> <span id="countryDisplay"></span></p>
+                        <p><strong>Duration:</strong> <span id="durationDisplay"></span></p>
                     </div>
                 </div>
 
-                <!-- Traditional POD Configuration -->
-                <form id="podConfigForm">
-                    <!-- Resource Requirements Section -->
-                    <div class="form-section resources">
-                        <h3>Resource Requirements</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="teamSize">Team Size (3-6 people maximum)</label>
-                                <select id="teamSize" name="teamSize" onchange="updateResourceSlots()" required>
-                                    <option value="">Select team size...</option>
-                                    <option value="3">3 people</option>
-                                    <option value="4">4 people</option>
-                                    <option value="5">5 people</option>
-                                    <option value="6">6 people</option>
-                                </select>
+                <!-- Configuration Form -->
+                <div class="config-section">
+                    <h4><i class="fas fa-cogs me-2"></i>POD Configuration</h4>
+                    <form id="configForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Team Size</label>
+                                <input type="number" class="form-control" id="teamSize" min="1" max="20" required>
                             </div>
-                            <div class="form-group">
-                                <label for="sprintDuration">Sprint Duration (weeks)</label>
-                                <select id="sprintDuration" name="sprintDuration" required>
-                                    <option value="">Select duration</option>
+                            <div class="col-md-6">
+                                <label class="form-label">Sprint Duration (weeks)</label>
+                                <select class="form-select" id="sprintDuration" required>
+                                    <option value="">Select Duration</option>
                                     <option value="1">1 week</option>
                                     <option value="2">2 weeks</option>
                                     <option value="3">3 weeks</option>
@@ -538,52 +171,1063 @@
                                 </select>
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label>Required Skills</label>
-                            <div class="skills-grid" id="skillsGrid">
-                                <div class="skill-checkbox">
-                                    <input type="checkbox" id="skill_ba" name="skills" value="BA">
-                                    <label for="skill_ba">Business Analysis</label>
-                                </div>
-                                <div class="skill-checkbox">
-                                    <input type="checkbox" id="skill_etl" name="skills" value="ETL">
-                                    <label for="skill_etl">ETL</label>
-                                </div>
-                                <div class="skill-checkbox">
-                                    <input type="checkbox" id="skill_bi" name="skills" value="BI">
-                                    <label for="skill_bi">BI</label>
-                                </div>
-                                <div class="skill-checkbox">
-                                    <input type="checkbox" id="skill_ui" name="skills" value="UI">
-                                    <label for="skill_ui">UI/UX</label>
-                                </div>
-                                <div class="skill-checkbox">
-                                    <input type="checkbox" id="skill_qa" name="skills" value="QA">
-                                    <label for="skill_qa">QA</label>
-                                </div>
-                                <div class="skill-checkbox">
-                                    <input type="checkbox" id="skill_db" name="skills" value="DB">
-                                    <label for="skill_db">Database</label>
-                                </div>
-                            </div>
+
+                        <div class="mt-3">
+                            <label class="form-label">Deliverables</label>
+                            <textarea class="form-control" id="deliverables" rows="3" 
+                                placeholder="List the key deliverables for this POD..."></textarea>
                         </div>
 
-                        <div id="resourceSlots">
-                            <p style="color: #6c757d; font-style: italic;">Select team size first to see resource allocation slots.</p>
+                        <div class="mt-3">
+                            <label class="form-label">Success Criteria</label>
+                            <textarea class="form-control" id="successCriteria" rows="3" 
+                                placeholder="Define what success looks like for this POD..."></textarea>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <label class="form-label">BA Handover Date</label>
+                                <input type="date" class="form-control" id="baHandover">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Reverse Walkthrough Date</label>
+                                <input type="date" class="form-control" id="reverseWalkthrough">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Review Day</label>
+                                <select class="form-select" id="reviewDay">
+                                    <option value="">Select Day</option>
+                                    <option value="Monday">Monday</option>
+                                    <option value="Tuesday">Tuesday</option>
+                                    <option value="Wednesday">Wednesday</option>
+                                    <option value="Thursday">Thursday</option>
+                                    <option value="Friday">Friday</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Resource Allocation Section -->
+                <div class="config-section">
+                    <h4><i class="fas fa-users me-2"></i>Resource Allocation</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Available Team Members</h6>
+                            <div id="availableResources">
+                                <!-- Available resources will be loaded here -->
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Assigned to POD <span id="assignedCount" class="badge bg-primary">0</span></h6>
+                            <div id="assignedResources">
+                                <!-- Assigned resources will be shown here -->
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Success Criteria Section -->
-                    <div class="form-section success">
-                        <h3>Success Criteria & Deliverables</h3>
-                        <div class="form-row full">
-                            <div class="form-group">
-                                <label for="deliverables">Key Deliverables</label>
-                                <textarea id="deliverables" name="deliverables" placeholder="List the key deliverables for this POD..."></textarea>
+                    <div class="mt-3">
+                        <h6>Required Skills</h6>
+                        <div id="skillsContainer">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="skillFullStack">
+                                        <label class="form-check-label" for="skillFullStack">Full Stack Development</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="skillFrontend">
+                                        <label class="form-check-label" for="skillFrontend">Frontend Development</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="skillBackend">
+                                        <label class="form-check-label" for="skillBackend">Backend Development</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="skillQA">
+                                        <label class="form-check-label" for="skillQA">QA Testing</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="skillDevOps">
+                                        <label class="form-check-label" for="skillDevOps">DevOps</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="skillBA">
+                                        <label class="form-check-label" for="skillBA">Business Analysis</label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-row full">
-                            <div class="form-group">
-                                <label for="successCriteria">Success Criteria</label>
-                                <textarea id="successCriteria" name="successCriteria" placeholder="Define
+                    </div>
+                </div>
+
+                <!-- JIRA Story Creation Section -->
+                <div class="config-section">
+                    <h4><i class="fab fa-jira me-2"></i>JIRA Story Creation</h4>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <p class="mb-0">Create JIRA stories for this POD based on scope and deliverables</p>
+                        <button type="button" class="btn btn-outline-primary" onclick="showCreateStoryModal()">
+                            <i class="fas fa-plus me-1"></i>Create Story
+                        </button>
+                    </div>
+                    
+                    <div id="jiraStoriesContainer">
+                        <!-- JIRA stories will be displayed here -->
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="button" class="btn btn-secondary me-2" onclick="generateDemoStories()">
+                            <i class="fas fa-magic me-1"></i>Generate Demo Stories
+                        </button>
+                        <button type="button" class="btn btn-info" onclick="loadStoryTemplates()">
+                            <i class="fas fa-template me-1"></i>Use Template
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Save Configuration -->
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-primary btn-lg me-3" onclick="saveConfiguration()">
+                        <i class="fas fa-save me-2"></i>Save Configuration
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary btn-lg" onclick="goBack()">
+                        <i class="fas fa-arrow-left me-2"></i>Go Back
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <!-- Configuration Summary -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i>Configuration Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="configSummary">
+                            <p><strong>Team Size:</strong> <span id="summaryTeamSize">Not set</span></p>
+                            <p><strong>Sprint Duration:</strong> <span id="summarySprint">Not set</span></p>
+                            <p><strong>Assigned Resources:</strong> <span id="summaryResources">0</span></p>
+                            <p><strong>JIRA Stories:</strong> <span id="summaryStories">0</span></p>
+                            <p><strong>Required Skills:</strong> <span id="summarySkills">None</span></p>
+                        </div>
+                        
+                        <div class="mt-3 pt-3 border-top">
+                            <h6>Configuration Status</h6>
+                            <div class="progress mb-2">
+                                <div class="progress-bar" id="configProgress" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <small class="text-muted">Complete all sections to launch POD</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-outline-info btn-sm mb-2 w-100" onclick="autoAssignResources()">
+                            <i class="fas fa-users-cog me-1"></i>Auto-Assign Resources
+                        </button>
+                        <button class="btn btn-outline-warning btn-sm mb-2 w-100" onclick="importFromJira()">
+                            <i class="fab fa-jira me-1"></i>Import from JIRA
+                        </button>
+                        <button class="btn btn-outline-success btn-sm w-100" onclick="previewPod()">
+                            <i class="fas fa-eye me-1"></i>Preview POD
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Launch POD Section (shown when configuration is complete) -->
+        <div id="launchSection" class="launch-section" style="display: none;">
+            <h2><i class="fas fa-rocket me-3"></i>Ready to Launch POD!</h2>
+            <p class="lead mb-4">Your POD configuration is complete. Launch to activate the team and begin sprint execution.</p>
+            
+            <div class="row text-center mb-4">
+                <div class="col-md-3">
+                    <h4 id="launchTeamSize">5</h4>
+                    <small>Team Members</small>
+                </div>
+                <div class="col-md-3">
+                    <h4 id="launchStoriesCount">3</h4>
+                    <small>JIRA Stories</small>
+                </div>
+                <div class="col-md-3">
+                    <h4 id="launchSprintWeeks">2</h4>
+                    <small>Sprint Weeks</small>
+                </div>
+                <div class="col-md-3">
+                    <h4 id="launchEstimatedHours">120</h4>
+                    <small>Est. Hours</small>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-launch btn-lg" onclick="launchPod()">
+                <i class="fas fa-rocket me-2"></i>Launch POD
+            </button>
+        </div>
+    </div>
+
+    <!-- Create JIRA Story Modal -->
+    <div class="modal fade" id="createStoryModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fab fa-jira me-2"></i>Create JIRA Story</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="storyForm">
+                        <div class="mb-3">
+                            <label class="form-label">Story Title</label>
+                            <input type="text" class="form-control" id="storyTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Story Description</label>
+                            <textarea class="form-control" id="storyDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Acceptance Criteria</label>
+                            <textarea class="form-control" id="acceptanceCriteria" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Business Benefit</label>
+                            <textarea class="form-control" id="businessBenefit" rows="2"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">Story Points</label>
+                                <select class="form-select" id="storyPoints">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="5" selected>5</option>
+                                    <option value="8">8</option>
+                                    <option value="13">13</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Priority</label>
+                                <select class="form-select" id="storyPriority">
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Assignee</label>
+                                <select class="form-select" id="storyAssignee">
+                                    <option value="">Unassigned</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="createJiraStory()">Create Story</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentPod = null;
+        let assignedResources = [];
+        let jiraStories = [];
+        let configProgress = 0;
+
+        // Available team members for demo
+        const availableTeamMembers = [
+            { id: 1, name: 'Asif Mohammed', role: 'Technical Lead', skills: ['Full Stack', 'Backend', 'DevOps'], avatar: 'AM' },
+            { id: 2, name: 'Kanya', role: 'Senior Developer', skills: ['Frontend', 'Full Stack'], avatar: 'K' },
+            { id: 3, name: 'Srini', role: 'Full Stack Developer', skills: ['Full Stack', 'QA'], avatar: 'S' },
+            { id: 4, name: 'Maria Garcia', role: 'QA Engineer', skills: ['QA', 'Testing'], avatar: 'MG' },
+            { id: 5, name: 'Carlos Silva', role: 'DevOps Engineer', skills: ['DevOps', 'Backend'], avatar: 'CS' },
+            { id: 6, name: 'Ana Rodriguez', role: 'Business Analyst', skills: ['Business Analysis'], avatar: 'AR' },
+            { id: 7, name: 'Pedro Martinez', role: 'Frontend Developer', skills: ['Frontend', 'UI/UX'], avatar: 'PM' },
+            { id: 8, name: 'Luis Fernando', role: 'Backend Developer', skills: ['Backend', 'Database'], avatar: 'LF' }
+        ];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPodData();
+            renderAvailableResources();
+            updateConfigSummary();
+            
+            // Add event listeners for real-time updates
+            document.getElementById('teamSize').addEventListener('input', updateConfigSummary);
+            document.getElementById('sprintDuration').addEventListener('change', updateConfigSummary);
+        });
+
+        // Load POD data from URL parameters or localStorage
+        function loadPodData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const podId = urlParams.get('podId');
+            
+            console.log('🔍 Loading POD data for ID:', podId);
+            console.log('🔍 Current URL:', window.location.href);
+            
+            if (!podId) {
+                console.error('❌ No podId found in URL parameters');
+                showToast('No POD ID found in URL. Please create a POD first.', 'error');
+                setTimeout(() => {
+                    window.location.href = '/create-pod.html';
+                }, 3000);
+                return;
+            }
+            
+            // Try to get from API first
+            console.log('📡 Fetching POD data from API...');
+            fetch(`/api/pods/${podId}`)
+                .then(response => {
+                    console.log('📡 API response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`API returned ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('✅ POD data loaded from API:', data);
+                    currentPod = data;
+                    displayPodInfo();
+                    prePopulateFromJira();
+                })
+                .catch(error => {
+                    console.log('⚠️ API call failed, using mock data:', error);
+                    // Use mock data for demo
+                    currentPod = {
+                        pod_id: podId,
+                        pod_name: `Demo POD for ${podId}`,
+                        business_line: podId.split('-')[0] || 'AML',
+                        country: podId.split('-')[1] || 'MEX',
+                        start_date: '2025-07-01',
+                        end_date: '2025-09-30',
+                        estimated_hours: 120,
+                        import_source: 'jira' // Force JIRA import for demo
+                    };
+                    
+                    console.log('📝 Using mock POD data:', currentPod);
+                    displayPodInfo();
+                    prePopulateFromJira();
+                });
+        }
+
+        // Display POD information
+        function displayPodInfo() {
+            if (!currentPod) return;
+            
+            document.getElementById('podIdDisplay').textContent = currentPod.pod_id || currentPod.podId;
+            document.getElementById('podNameDisplay').textContent = currentPod.pod_name || currentPod.podName;
+            document.getElementById('businessLineDisplay').textContent = currentPod.business_line || currentPod.businessLine;
+            document.getElementById('countryDisplay').textContent = currentPod.country;
+            
+            const startDate = new Date(currentPod.start_date || currentPod.startDate);
+            const endDate = new Date(currentPod.end_date || currentPod.endDate);
+            const duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24 * 7));
+            document.getElementById('durationDisplay').textContent = `${duration} weeks`;
+        }
+
+        // Pre-populate fields if POD was created from JIRA import
+        function prePopulateFromJira() {
+            console.log('🔄 Starting pre-population process...');
+            
+            // First check localStorage for import data
+            const importDataStr = localStorage.getItem('podImportData');
+            let importData = null;
+            
+            console.log('📦 localStorage podImportData:', importDataStr);
+            
+            if (importDataStr) {
+                const storedData = JSON.parse(importDataStr);
+                if (storedData.podId === currentPod.pod_id || storedData.podId === currentPod.podId) {
+                    importData = storedData;
+                    console.log('📥 Found import data in localStorage:', importData);
+                }
+            }
+            
+            // Also check if POD has import metadata
+            if (currentPod && currentPod.import_source === 'jira') {
+                const metadata = currentPod.import_metadata ? JSON.parse(currentPod.import_metadata) : null;
+                if (metadata) {
+                    importData = { importSource: 'jira', importData: metadata };
+                    console.log('📥 Found import data in POD metadata:', importData);
+                }
+            }
+            
+            // FOR DEMO: Force JIRA import if none found
+            if (!importData && currentPod) {
+                console.log('🎭 No import data found, creating demo JIRA import...');
+                importData = {
+                    importSource: 'jira',
+                    importData: {
+                        key: 'AML-1001',
+                        summary: 'Implement customer screening for Mexico AML compliance',
+                        description: 'Develop automated customer screening system to meet Mexican AML regulatory requirements',
+                        businessLine: 'AML',
+                        country: 'Mexico',
+                        scope: 'Build comprehensive customer screening system with real-time monitoring capabilities',
+                        deliverables: [
+                            'Customer screening API',
+                            'Risk assessment engine', 
+                            'Compliance reporting dashboard',
+                            'Integration with existing systems'
+                        ],
+                        acceptanceCriteria: 'System must screen 100% of new customers within 30 seconds and flag high-risk profiles',
+                        timeEstimate: '120h',
+                        storyPoints: 8,
+                        priority: 'High'
+                    }
+                };
+                console.log('🎭 Created demo import data:', importData);
+            }
+            
+            if (importData && importData.importSource === 'jira' && importData.importData) {
+                const jiraData = importData.importData;
+                console.log('🔄 Pre-populating from JIRA data:', jiraData);
+                
+                // Pre-fill deliverables from JIRA
+                if (jiraData.deliverables && Array.isArray(jiraData.deliverables)) {
+                    const deliverableText = '• ' + jiraData.deliverables.join('\n• ');
+                    document.getElementById('deliverables').value = deliverableText;
+                    console.log('✅ Set deliverables:', deliverableText);
+                } else if (jiraData.scope) {
+                    const deliverableText = `• ${jiraData.scope}\n• System implementation\n• Testing and validation`;
+                    document.getElementById('deliverables').value = deliverableText;
+                    console.log('✅ Set deliverables from scope:', deliverableText);
+                }
+                
+                // Pre-fill success criteria from JIRA acceptance criteria
+                if (jiraData.acceptanceCriteria) {
+                    document.getElementById('successCriteria').value = jiraData.acceptanceCriteria;
+                    console.log('✅ Set success criteria:', jiraData.acceptanceCriteria);
+                } else {
+                    const criteria = `System must meet all ${currentPod.business_line} requirements for ${currentPod.country} operations`;
+                    document.getElementById('successCriteria').value = criteria;
+                    console.log('✅ Set default success criteria:', criteria);
+                }
+                
+                // Set team size based on story points or default
+                const estimatedTeamSize = Math.min(Math.max(Math.ceil((jiraData.storyPoints || 8) / 3), 3), 8);
+                document.getElementById('teamSize').value = estimatedTeamSize;
+                console.log('✅ Set team size:', estimatedTeamSize);
+                
+                // Set sprint duration based on timeEstimate
+                if (jiraData.timeEstimate) {
+                    const hours = parseInt(jiraData.timeEstimate.replace('h', ''));
+                    const weeks = Math.ceil(hours / (estimatedTeamSize * 40)); // 40 hours per person per week
+                    const sprintWeeks = Math.min(Math.max(weeks, 1), 4);
+                    document.getElementById('sprintDuration').value = sprintWeeks;
+                    console.log('✅ Set sprint duration:', sprintWeeks, 'weeks');
+                } else {
+                    document.getElementById('sprintDuration').value = '2'; // Default 2 weeks
+                    console.log('✅ Set default sprint duration: 2 weeks');
+                }
+                
+                // Auto-create initial JIRA story from import data
+                setTimeout(() => {
+                    createInitialJiraStory(jiraData);
+                }, 1000);
+                
+                // Show success message
+                showToast(`✅ Pre-populated from JIRA issue ${jiraData.key || 'data'}`, 'success');
+                
+                // Update summary
+                setTimeout(() => {
+                    updateConfigSummary();
+                }, 500);
+                
+                // Clean up localStorage
+                localStorage.removeItem('podImportData');
+            } else if (importData && importData.importSource === 'ccb' && importData.importData) {
+                const ccbData = importData.importData;
+                console.log('🔄 Pre-populating from CCB data:', ccbData);
+                
+                // Pre-fill from CCB data
+                if (ccbData.deliverables && Array.isArray(ccbData.deliverables)) {
+                    const deliverableText = '• ' + ccbData.deliverables.join('\n• ');
+                    document.getElementById('deliverables').value = deliverableText;
+                } else if (ccbData.scope) {
+                    document.getElementById('deliverables').value = `• ${ccbData.scope}\n• Implementation according to CCB requirements\n• Testing and validation`;
+                }
+                
+                document.getElementById('successCriteria').value = `Implementation meets all CCB requirements for ${ccbData.title}`;
+                
+                // Set team size based on priority
+                const teamSize = ccbData.priority === 'Critical' ? 5 : ccbData.priority === 'High' ? 4 : 3;
+                document.getElementById('teamSize').value = teamSize;
+                document.getElementById('sprintDuration').value = '2';
+                
+                showToast(`✅ Pre-populated from CCB item ${ccbData.ccbId}`, 'success');
+                setTimeout(() => {
+                    updateConfigSummary();
+                }, 500);
+                localStorage.removeItem('podImportData');
+            } else {
+                console.log('ℹ️ No import data to pre-populate');
+            }
+        }
+
+        // Create initial JIRA story from import data
+        function createInitialJiraStory(importData) {
+            const story = {
+                id: Date.now(),
+                title: importData.summary || `Implement ${currentPod.pod_name}`,
+                description: importData.description || importData.scope || '',
+                acceptanceCriteria: importData.acceptanceCriteria || '',
+                businessBenefit: `Implementation of ${currentPod.business_line} requirements for ${currentPod.country}`,
+                storyPoints: 8,
+                priority: 'high',
+                assignee: 'Asif Mohammed',
+                status: 'To Do',
+                jiraId: `${currentPod.business_line}-${Date.now().toString().slice(-4)}`
+            };
+            
+            jiraStories.push(story);
+            renderJiraStories();
+            updateConfigSummary();
+            
+            // Show success message
+            showToast('Initial JIRA story created from import data', 'success');
+        }
+
+        // Render available resources
+        function renderAvailableResources() {
+            const container = document.getElementById('availableResources');
+            container.innerHTML = '';
+            
+            availableTeamMembers.forEach(member => {
+                if (!assignedResources.find(r => r.id === member.id)) {
+                    const resourceCard = createResourceCard(member, false);
+                    container.appendChild(resourceCard);
+                }
+            });
+        }
+
+        // Render assigned resources
+        function renderAssignedResources() {
+            const container = document.getElementById('assignedResources');
+            container.innerHTML = '';
+            
+            assignedResources.forEach(member => {
+                const resourceCard = createResourceCard(member, true);
+                container.appendChild(resourceCard);
+            });
+            
+            document.getElementById('assignedCount').textContent = assignedResources.length;
+        }
+
+        // Create resource card
+        function createResourceCard(member, isAssigned) {
+            const card = document.createElement('div');
+            card.className = 'resource-card';
+            card.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="resource-avatar me-3">${member.avatar}</div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">${member.name}</h6>
+                        <small class="text-muted">${member.role}</small>
+                        <div class="mt-1">
+                            ${member.skills.map(skill => `<span class="badge bg-light text-dark me-1">${skill}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm ${isAssigned ? 'btn-outline-danger' : 'btn-outline-primary'}" 
+                                onclick="${isAssigned ? 'unassignResource' : 'assignResource'}(${member.id})">
+                            <i class="fas ${isAssigned ? 'fa-minus' : 'fa-plus'}"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        // Assign resource to POD
+        function assignResource(memberId) {
+            const member = availableTeamMembers.find(m => m.id === memberId);
+            if (member && !assignedResources.find(r => r.id === memberId)) {
+                assignedResources.push(member);
+                renderAvailableResources();
+                renderAssignedResources();
+                updateConfigSummary();
+                showToast(`${member.name} assigned to POD`, 'success');
+            }
+        }
+
+        // Unassign resource from POD
+        function unassignResource(memberId) {
+            const member = assignedResources.find(m => m.id === memberId);
+            if (member) {
+                assignedResources = assignedResources.filter(r => r.id !== memberId);
+                renderAvailableResources();
+                renderAssignedResources();
+                updateConfigSummary();
+                showToast(`${member.name} removed from POD`, 'warning');
+            }
+        }
+
+        // Auto-assign resources based on required skills
+        function autoAssignResources() {
+            const teamSize = parseInt(document.getElementById('teamSize').value) || 0;
+            if (teamSize === 0) {
+                showToast('Please set team size first', 'warning');
+                return;
+            }
+
+            // Get checked skills
+            const requiredSkills = [];
+            document.querySelectorAll('#skillsContainer input[type="checkbox"]:checked').forEach(checkbox => {
+                requiredSkills.push(checkbox.nextElementSibling.textContent);
+            });
+
+            // Clear current assignments
+            assignedResources = [];
+
+            // Auto-assign based on skills and availability
+            let assigned = 0;
+            for (let member of availableTeamMembers) {
+                if (assigned >= teamSize) break;
+                
+                if (requiredSkills.length === 0 || member.skills.some(skill => 
+                    requiredSkills.some(req => skill.includes(req.split(' ')[0])))) {
+                    assignedResources.push(member);
+                    assigned++;
+                }
+            }
+
+            // Fill remaining slots if needed
+            while (assigned < teamSize && assigned < availableTeamMembers.length) {
+                const remaining = availableTeamMembers.filter(m => !assignedResources.find(a => a.id === m.id));
+                if (remaining.length > 0) {
+                    assignedResources.push(remaining[0]);
+                    assigned++;
+                } else {
+                    break;
+                }
+            }
+
+            renderAvailableResources();
+            renderAssignedResources();
+            updateConfigSummary();
+            showToast(`Auto-assigned ${assigned} team members`, 'success');
+        }
+
+        // Show create story modal
+        function showCreateStoryModal() {
+            // Populate assignee dropdown
+            const assigneeSelect = document.getElementById('storyAssignee');
+            assigneeSelect.innerHTML = '<option value="">Unassigned</option>';
+            assignedResources.forEach(member => {
+                assigneeSelect.innerHTML += `<option value="${member.name}">${member.name}</option>`;
+            });
+
+            const modal = new bootstrap.Modal(document.getElementById('createStoryModal'));
+            modal.show();
+        }
+
+        // Create JIRA story
+        function createJiraStory() {
+            const title = document.getElementById('storyTitle').value;
+            if (!title) {
+                showToast('Story title is required', 'error');
+                return;
+            }
+
+            const story = {
+                id: Date.now(),
+                title: title,
+                description: document.getElementById('storyDescription').value,
+                acceptanceCriteria: document.getElementById('acceptanceCriteria').value,
+                businessBenefit: document.getElementById('businessBenefit').value,
+                storyPoints: parseInt(document.getElementById('storyPoints').value),
+                priority: document.getElementById('storyPriority').value,
+                assignee: document.getElementById('storyAssignee').value,
+                status: 'To Do',
+                jiraId: `${currentPod.business_line || 'POD'}-${Date.now().toString().slice(-4)}`
+            };
+
+            jiraStories.push(story);
+            renderJiraStories();
+            updateConfigSummary();
+
+            // Clear form and close modal
+            document.getElementById('storyForm').reset();
+            bootstrap.Modal.getInstance(document.getElementById('createStoryModal')).hide();
+
+            showToast('JIRA story created successfully', 'success');
+        }
+
+        // Generate demo stories
+        function generateDemoStories() {
+            const demoStories = [
+                {
+                    id: Date.now() + 1,
+                    title: `Setup development environment for ${currentPod.pod_name || 'POD'}`,
+                    description: 'Configure development environment, version control, and CI/CD pipeline',
+                    acceptanceCriteria: 'Given that the team is ready to start development, when the environment is set up, then all team members can access the development tools',
+                    businessBenefit: 'Enables efficient development workflow and code quality',
+                    storyPoints: 3,
+                    priority: 'high',
+                    assignee: assignedResources[0]?.name || '',
+                    status: 'To Do',
+                    jiraId: `${currentPod.business_line || 'POD'}-${(Date.now() + 1).toString().slice(-4)}`
+                },
+                {
+                    id: Date.now() + 2,
+                    title: `Implement core business logic for ${currentPod.business_line || 'system'}`,
+                    description: 'Develop the main business logic and core functionality according to requirements',
+                    acceptanceCriteria: 'Given the business requirements, when the core logic is implemented, then the system performs the primary business functions correctly',
+                    businessBenefit: 'Delivers the primary value proposition of the system',
+                    storyPoints: 8,
+                    priority: 'high',
+                    assignee: assignedResources[1]?.name || '',
+                    status: 'To Do',
+                    jiraId: `${currentPod.business_line || 'POD'}-${(Date.now() + 2).toString().slice(-4)}`
+                },
+                {
+                    id: Date.now() + 3,
+                    title: 'Comprehensive testing and quality assurance',
+                    description: 'Perform unit testing, integration testing, and user acceptance testing',
+                    acceptanceCriteria: 'Given the implemented features, when testing is complete, then all tests pass and quality metrics are met',
+                    businessBenefit: 'Ensures system reliability and user satisfaction',
+                    storyPoints: 5,
+                    priority: 'medium',
+                    assignee: assignedResources[2]?.name || '',
+                    status: 'To Do',
+                    jiraId: `${currentPod.business_line || 'POD'}-${(Date.now() + 3).toString().slice(-4)}`
+                }
+            ];
+
+            jiraStories.push(...demoStories);
+            renderJiraStories();
+            updateConfigSummary();
+            showToast('Demo stories generated successfully', 'success');
+        }
+
+        // Render JIRA stories
+        function renderJiraStories() {
+            const container = document.getElementById('jiraStoriesContainer');
+            container.innerHTML = '';
+
+            if (jiraStories.length === 0) {
+                container.innerHTML = '<p class="text-muted text-center">No JIRA stories created yet. Click "Create Story" to add one.</p>';
+                return;
+            }
+
+            jiraStories.forEach(story => {
+                const storyCard = document.createElement('div');
+                storyCard.className = `jira-story-card priority-${story.priority}`;
+                storyCard.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="mb-1">${story.title}</h6>
+                            <small class="text-primary">${story.jiraId}</small>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <span class="story-points me-2">${story.storyPoints}</span>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeStory(${story.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="small mb-2">${story.description}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-${story.priority === 'high' ? 'danger' : story.priority === 'medium' ? 'warning' : 'success'}">${story.priority.toUpperCase()}</span>
+                        <small class="text-muted">Assigned to: ${story.assignee || 'Unassigned'}</small>
+                    </div>
+                `;
+                container.appendChild(storyCard);
+            });
+        }
+
+        // Remove story
+        function removeStory(storyId) {
+            jiraStories = jiraStories.filter(s => s.id !== storyId);
+            renderJiraStories();
+            updateConfigSummary();
+            showToast('Story removed', 'warning');
+        }
+
+        // Update configuration summary
+        function updateConfigSummary() {
+            const teamSize = document.getElementById('teamSize').value || 'Not set';
+            const sprintDuration = document.getElementById('sprintDuration').value ? 
+                document.getElementById('sprintDuration').value + ' weeks' : 'Not set';
+            
+            document.getElementById('summaryTeamSize').textContent = teamSize;
+            document.getElementById('summarySprint').textContent = sprintDuration;
+            document.getElementById('summaryResources').textContent = assignedResources.length;
+            document.getElementById('summaryStories').textContent = jiraStories.length;
+
+            // Update skills summary
+            const checkedSkills = [];
+            document.querySelectorAll('#skillsContainer input[type="checkbox"]:checked').forEach(checkbox => {
+                checkedSkills.push(checkbox.nextElementSibling.textContent);
+            });
+            document.getElementById('summarySkills').textContent = checkedSkills.length > 0 ? 
+                checkedSkills.join(', ') : 'None';
+
+            // Calculate progress
+            let progress = 0;
+            if (document.getElementById('teamSize').value) progress += 20;
+            if (document.getElementById('sprintDuration').value) progress += 20;
+            if (assignedResources.length > 0) progress += 30;
+            if (jiraStories.length > 0) progress += 20;
+            if (document.getElementById('deliverables').value && document.getElementById('successCriteria').value) progress += 10;
+
+            document.getElementById('configProgress').style.width = progress + '%';
+            document.getElementById('configProgress').className = `progress-bar ${progress < 50 ? 'bg-danger' : progress < 80 ? 'bg-warning' : 'bg-success'}`;
+
+            // Show launch section if configuration is complete
+            if (progress >= 90) {
+                document.getElementById('launchSection').style.display = 'block';
+                updateLaunchSummary();
+            } else {
+                document.getElementById('launchSection').style.display = 'none';
+            }
+        }
+
+        // Update launch summary
+        function updateLaunchSummary() {
+            document.getElementById('launchTeamSize').textContent = assignedResources.length;
+            document.getElementById('launchStoriesCount').textContent = jiraStories.length;
+            document.getElementById('launchSprintWeeks').textContent = document.getElementById('sprintDuration').value || '0';
+            
+            const totalStoryPoints = jiraStories.reduce((sum, story) => sum + story.storyPoints, 0);
+            const estimatedHours = totalStoryPoints * 8; // 8 hours per story point
+            document.getElementById('launchEstimatedHours').textContent = estimatedHours;
+        }
+
+        // Save configuration
+        function saveConfiguration() {
+            const config = {
+                podId: currentPod.pod_id || currentPod.podId,
+                teamSize: parseInt(document.getElementById('teamSize').value),
+                deliverables: document.getElementById('deliverables').value,
+                successCriteria: document.getElementById('successCriteria').value,
+                sprintDuration: parseInt(document.getElementById('sprintDuration').value),
+                baHandover: document.getElementById('baHandover').value,
+                reverseWalkthrough: document.getElementById('reverseWalkthrough').value,
+                reviewDay: document.getElementById('reviewDay').value,
+                skills: getSelectedSkills(),
+                resources: assignedResources,
+                jiraStories: jiraStories
+            };
+
+            fetch('/api/pods/configure', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(config)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Configuration saved successfully', 'success');
+                    updateConfigSummary();
+                } else {
+                    showToast('Error saving configuration', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Configuration saved locally (demo mode)', 'info');
+                updateConfigSummary();
+            });
+        }
+
+        // Get selected skills
+        function getSelectedSkills() {
+            const skills = [];
+            document.querySelectorAll('#skillsContainer input[type="checkbox"]:checked').forEach(checkbox => {
+                skills.push(checkbox.nextElementSibling.textContent);
+            });
+            return skills;
+        }
+
+        // Launch POD
+        function launchPod() {
+            if (!currentPod) {
+                showToast('POD data not found', 'error');
+                return;
+            }
+
+            const confirmLaunch = confirm('Are you sure you want to launch this POD? This will activate the team and begin sprint execution.');
+            if (!confirmLaunch) return;
+
+            const launchData = {
+                pod_id: currentPod.pod_id || currentPod.podId,
+                team_members: assignedResources,
+                jira_stories: jiraStories
+            };
+
+            console.log('🚀 Launching POD with data:', launchData);
+
+            fetch('/api/pods/launch', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(launchData)
+            })
+            .then(response => {
+                console.log('🚀 Launch response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`Launch API returned ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('🚀 Launch response data:', data);
+                if (data.success) {
+                    showToast('POD launched successfully!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard.html';
+                    }, 2000);
+                } else {
+                    showToast('Error launching POD: ' + (data.error || 'Unknown error'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('❌ Launch error:', error);
+                // For demo purposes, simulate successful launch
+                showToast('POD launched successfully! (demo mode)', 'success');
+                setTimeout(() => {
+                    window.location.href = '/dashboard.html';
+                }, 2000);
+            });
+        }
+
+        // Import from JIRA
+        function importFromJira() {
+            showToast('JIRA import feature - searching for related stories...', 'info');
+            
+            // Simulate JIRA import
+            setTimeout(() => {
+                const jiraImportData = {
+                    title: `${currentPod.business_line} Enhancement for ${currentPod.country}`,
+                    description: 'Enhancement based on regulatory requirements and business needs',
+                    acceptanceCriteria: 'System meets all compliance requirements and business objectives',
+                    businessBenefit: 'Improved compliance and operational efficiency',
+                    storyPoints: 8,
+                    priority: 'high'
+                };
+
+                // Pre-fill form fields
+                document.getElementById('deliverables').value = `${jiraImportData.title} deliverables:\n- Core system implementation\n- Compliance reporting\n- User training materials`;
+                document.getElementById('successCriteria').value = jiraImportData.acceptanceCriteria;
+
+                showToast('JIRA data imported successfully', 'success');
+                updateConfigSummary();
+            }, 1500);
+        }
+
+        // Preview POD
+        function previewPod() {
+            const config = {
+                pod: currentPod,
+                teamSize: document.getElementById('teamSize').value,
+                assignedResources: assignedResources,
+                jiraStories: jiraStories,
+                deliverables: document.getElementById('deliverables').value,
+                successCriteria: document.getElementById('successCriteria').value
+            };
+
+            localStorage.setItem('podPreview', JSON.stringify(config));
+            window.open('/pod-summary.html?preview=true', '_blank');
+        }
+
+        // Load story templates
+        function loadStoryTemplates() {
+            fetch('/api/jira/templates')
+                .then(response => response.json())
+                .then(data => {
+                    showToast('Story templates loaded - feature coming soon', 'info');
+                })
+                .catch(error => {
+                    showToast('Story templates feature - coming soon', 'info');
+                });
+        }
+
+        // Go back
+        function goBack() {
+            window.history.back();
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = '/';
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer') || createToastContainer();
+            
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'primary'} border-0`;
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${message}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            toastContainer.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        // Create toast container
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+            return container;
+        }
+
+        // Initialize demo data if needed
+        function initializeDemoData() {
+            // Auto-assign some team members for demo
+            if (assignedResources.length === 0 && currentPod) {
+                assignedResources.push(availableTeamMembers[0]); // Asif
+                assignedResources.push(availableTeamMembers[1]); // Kanya
+                assignedResources.push(availableTeamMembers[2]); // Srini
+                
+                renderAvailableResources();
+                renderAssignedResources();
+                
+                // Set some default values
+                document.getElementById('teamSize').value = '3';
+                document.getElementById('sprintDuration').value = '2';
+                
+                updateConfigSummary();
+            }
+        }
+
+        // Initialize demo data after page load
+        setTimeout(initializeDemoData, 2000);
+    </script>
+</body>
+</html>

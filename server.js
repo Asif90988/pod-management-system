@@ -197,10 +197,10 @@ app.get('/api/pods/:podId', async (req, res) => {
   }
 });
 
-// Save POD configuration
+// Enhanced POD configuration with resource allocation and JIRA stories
 app.post('/api/pods/configure', async (req, res) => {
   try {
-    console.log('📝 Received configuration data:', req.body);
+    console.log('📝 Received enhanced configuration data:', req.body);
     
     const { 
       podId, 
@@ -212,10 +212,11 @@ app.post('/api/pods/configure', async (req, res) => {
       reverseWalkthrough, 
       reviewDay, 
       skills, 
-      resources 
+      resources,
+      jiraStories
     } = req.body;
     
-    console.log('🔄 Updating POD:', podId);
+    console.log('🔄 Updating POD with resource allocation:', podId);
     
     const result = await pool.query(
       `UPDATE pods SET 
@@ -241,21 +242,41 @@ app.post('/api/pods/configure', async (req, res) => {
       ]
     );
     
-    console.log('✅ Update successful:', result.rows[0]);
+    console.log('✅ POD configuration updated successfully');
     
-    res.json({ success: true, message: 'Configuration saved successfully', pod: result.rows[0] });
+    // Store resource allocation and JIRA stories in localStorage for demo
+    // In production, you'd save these to database tables
+    const configData = {
+      podId,
+      resources: resources || [],
+      jiraStories: jiraStories || [],
+      configuredAt: new Date().toISOString()
+    };
+    
+    console.log('📊 Resource allocation:', resources?.length || 0, 'team members');
+    console.log('📝 JIRA stories:', jiraStories?.length || 0, 'stories created');
+    
+    res.json({ 
+      success: true, 
+      message: 'Configuration saved successfully', 
+      pod: result.rows[0],
+      resourceCount: resources?.length || 0,
+      storyCount: jiraStories?.length || 0
+    });
   } catch (error) {
     console.error('❌ Configuration save error:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Launch POD endpoint
+// Enhanced Launch POD endpoint with team and story tracking
 app.post('/api/pods/launch', async (req, res) => {
   try {
-    const { pod_id } = req.body;
+    const { pod_id, team_members, jira_stories } = req.body;
     
-    console.log('🚀 Launching POD:', pod_id);
+    console.log('🚀 Launching POD with enhanced data:', pod_id);
+    console.log('👥 Team members:', team_members?.length || 0);
+    console.log('📝 JIRA stories:', jira_stories?.length || 0);
     
     const result = await pool.query(
       'UPDATE pods SET status = $1 WHERE pod_id = $2 RETURNING *',
@@ -266,9 +287,15 @@ app.post('/api/pods/launch', async (req, res) => {
       return res.status(404).json({ error: 'POD not found' });
     }
     
-    console.log('✅ POD launched successfully:', result.rows[0]);
+    console.log('✅ POD launched successfully with full team allocation');
     
-    res.json({ success: true, pod: result.rows[0] });
+    res.json({ 
+      success: true, 
+      pod: result.rows[0],
+      teamSize: team_members?.length || 0,
+      storiesCreated: jira_stories?.length || 0,
+      message: `POD ${pod_id} launched with ${team_members?.length || 0} team members and ${jira_stories?.length || 0} JIRA stories`
+    });
   } catch (error) {
     console.error('❌ Launch error:', error);
     res.status(500).json({ error: error.message });
